@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, FlatList, Pressable } from "react-native";
 import Notes from "../components/note.json"
-import { Link } from "expo-router"
+import { Link, router } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 
 export default function Index() {
@@ -26,7 +26,9 @@ export default function Index() {
               <Text style={styles.emptyTitle}>No notes</Text>
               <Text style={styles.emptySubtitle}>Notes created will appear here</Text>
             </View>
-            <Pressable style={styles.createNoteButton}>
+            <Pressable style={styles.createNoteButton}
+              onPress={() => {router.push('/createNote')}}
+            >
               <FontAwesome name="plus" size={18} color={'white'}/>
               <Text style={styles.createButtonText}>Create Note</Text>
             </Pressable>
@@ -41,6 +43,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'white',
+    padding: 10
   },
   emptyListContainer: {
     flex: 1,
