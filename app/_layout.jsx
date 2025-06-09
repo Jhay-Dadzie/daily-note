@@ -5,12 +5,17 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{
-        title: 'Daily Notes',
-        headerTitleStyle: {
+    <Stack screenOptions={{
+      headerTitleStyle: {
           fontWeight: 'bold'
         }
+    }}>
+      <Stack.Screen name="index" options={{
+        title: 'Daily Notes',
+      }}/>
+      <Stack.Screen name="createNote" options={{
+        presentation: 'modal',
+        title: "Create Note",
       }}/>
     </Stack>
   )

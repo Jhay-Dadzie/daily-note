@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-  marginTop: -50, // Adjust this if needed to fine-tune vertical centering
+    marginTop: -50,
   },
   emptyImage: {
     width: 80,
