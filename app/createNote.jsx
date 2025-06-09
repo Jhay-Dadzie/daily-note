@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, StatusBar } from 'react-native';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Note from '@/components/note.json'
 
 export default function createNote() {
     const [title, setTitle] = useState("")
