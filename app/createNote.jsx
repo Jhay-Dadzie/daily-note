@@ -1,13 +1,43 @@
-import { Link } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Link, router } from 'expo-router';
+import { useState } from 'react';
 import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, StatusBar } from 'react-native';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Note from '@/components/note.json'
+import { Notes } from '@/components/note';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function createNote() {
     const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
+    const [notes, setNotes] = useState(Notes.sort((a,b) => b.id - a.id)|| [])
+
+    const addNote = async () => {
+    if (body.trim()) {
+        try {
+            const savedNotes = await AsyncStorage.getItem('notes');
+            const existingNotes = savedNotes ? JSON.parse(savedNotes) : [];
+            
+            const newId = existingNotes.length > 0 
+                ? Math.max(...existingNotes.map(note => note.id)) + 1 : 1;
+
+            const newNote = {
+                id: newId,
+                title: title || "No title",
+                body
+            };
+            const updatedNotes = [newNote, ...existingNotes];
+            await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+            setNotes(updatedNotes);
+        
+            router.back({ pathname: '/', params: { refresh: true } });
+        } catch (error) {
+            console.error('Failed to save note', error);
+        }
+        } else {
+            alert("Please type your notes before you save");
+        }
+    }
+
   return (
     <Animated.View
         entering={SlideInDown}
@@ -27,12 +57,12 @@ export default function createNote() {
                 value={body}
                 onChangeText={setBody}
             />
-            <Pressable style={styles.saveButton}>
+            <Pressable style={styles.saveButton} onPress={addNote}>
                 <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
                     <FontAwesome name='plus' size={25} color={'white'}/>
                     <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Save Note</Text>
                 </View>
-                
+     
             </Pressable>
 
         </SafeAreaView>
