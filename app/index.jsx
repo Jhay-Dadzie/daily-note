@@ -1,13 +1,24 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, FlatList, Pressable } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, FlatList, Pressable, Platform } from "react-native";
 import { Notes } from "@/components/note"
 import { Link, router } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams } from "expo-router";
 
 export default function Index() {
+  const { refresh } = useLocalSearchParams()
   const [notes, setNotes] = useState([]);
 
+  const deleteNote = async (id) => {
+    const filteredNotes = notes.filter(note => note.id !== id);
+    setNotes(filteredNotes);
+    try {
+      await AsyncStorage.setItem("notes", JSON.stringify(filteredNotes))
+    } catch(error) {
+      console.error("Notes cannot be deleted", error )
+    }
+  }
   const renderItem = ({item}) => {
     return (
       <View style={styles.noteView}>
@@ -21,6 +32,7 @@ export default function Index() {
           padding: 10,
           borderRadius: 10
         }}
+        onPress={() => deleteNote(item.id)}
         >
           <FontAwesome name="trash" size={22} color={'#ffa400'}/>
         </Pressable>
@@ -34,7 +46,7 @@ export default function Index() {
         if (savedNotes) {
           setNotes(JSON.parse(savedNotes).sort((a, b) => b.id - a.id));
         } else {
-          setNotes(Notes.sort((a, b) => b.id - a.id) || []);
+          setNotes([]);
         }
       } catch (error) {
         console.error('Failed to load notes', error);
@@ -42,14 +54,15 @@ export default function Index() {
     };
 
     loadNotes();
-  }, [[router.params?.refresh]]);
+  }, [refresh]); // ✅ Flat dependency
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList 
         data={notes}
         contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
         renderItem={renderItem}
-        keyExtractor={(notes) => notes.id}
+        keyExtractor={(notes) => notes.id.toString()}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -61,24 +74,27 @@ export default function Index() {
               <Text style={styles.emptyTitle}>No notes</Text>
               <Text style={styles.emptySubtitle}>Notes created will appear here</Text>
             </View>
-            <Pressable style={styles.createNoteButton}
-              onPress={() => {router.push('/createNote')}}
-            >
-              <FontAwesome name="plus" size={18} color={'white'}/>
-              <Text style={styles.createButtonText}>Create Note</Text>
-            </Pressable>
+            <Link href={'/createNote'} asChild>
+              <Pressable style={styles.createNoteButton}>
+                <FontAwesome name="plus" size={18} color={'white'}/>
+                <Text style={styles.createButtonText}>Create Note</Text>
+              </Pressable>
+            </Link>
           </View>
         )}  
       />
 
       {
         notes.length > 0 && (
-        <Pressable style={styles.addNoteButton} onPress={() => router.push('/createNote')}>
-          <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
-              <FontAwesome name='plus' size={25} color={'white'}/>
-              <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Create Note</Text>
-          </View>
-        </Pressable>
+          <Link href={"/createNote"} asChild>
+            <Pressable style={styles.addNoteButton}>
+              <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
+                  <FontAwesome name='plus' size={25} color={'white'}/>
+                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Create Note</Text>
+              </View>
+            </Pressable>
+          </Link>
+        
         )
       }
     </SafeAreaView>
@@ -162,7 +178,7 @@ const styles = StyleSheet.create({
     borderRadius: '100%',
     overflow: 'hidden',
     position: 'absolute',
-    bottom: 70,
+    bottom: Platform.OS === 'ios' ? 90 : 70,
     right: 40
   }
 });
