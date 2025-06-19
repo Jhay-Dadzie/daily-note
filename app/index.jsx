@@ -7,6 +7,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
   const [notes, setNotes] = useState([]);
+
+  const renderItem = ({item}) => {
+    return (
+      <View style={styles.noteView}>
+        <View style={styles.noteViewContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.body}>{item.body}</Text>
+        </View>
+        <Pressable style={{
+          marginRight: 15,
+          backgroundColor: 'rgb(50, 49, 49)',
+          padding: 10,
+          borderRadius: 10
+        }}
+        >
+          <FontAwesome name="trash" size={22} color={'#ffa400'}/>
+        </Pressable>
+      </View>
+    )
+  }
   useEffect(() => {
     const loadNotes = async () => {
       try {
@@ -28,13 +48,8 @@ export default function Index() {
       <FlatList 
         data={notes}
         contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
-        renderItem={({item}) => (
-          <View style={styles.noteView}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.body}>{item.body}</Text>
-          </View>
-          
-        )}
+        renderItem={renderItem}
+        keyExtractor={(notes) => notes.id}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -109,7 +124,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 2,
     borderRadius: 10,
-    borderColor: '#ffa400'
+    borderColor: '#ffa400',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   title: {
     fontSize: 22,
