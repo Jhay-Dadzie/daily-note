@@ -6,33 +6,35 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Notes } from '@/components/note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 export default function createNote() {
+    
     const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
     const [notes, setNotes] = useState(Notes.sort((a,b) => b.id - a.id)|| [])
 
     const addNote = async () => {
-    if (body.trim()) {
-        try {
-            const savedNotes = await AsyncStorage.getItem('notes');
-            const existingNotes = savedNotes ? JSON.parse(savedNotes) : [];
-            
-            const newId = existingNotes.length > 0 
-                ? Math.max(...existingNotes.map(note => note.id)) + 1 : 1;
+        if (body.trim()) {
+            try {
+                const savedNotes = await AsyncStorage.getItem('notes');
+                const existingNotes = savedNotes ? JSON.parse(savedNotes) : [];
+                
+                const newId = existingNotes.length > 0 
+                    ? Math.max(...existingNotes.map(note => note.id)) + 1 : 1;
 
-            const newNote = {
-                id: newId,
-                title: title || "No title",
-                body
-            };
-            const updatedNotes = [newNote, ...existingNotes];
-            await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-            setNotes(updatedNotes);
-        
-            router.back({ pathname: '/', params: { refresh: true } });
-        } catch (error) {
-            console.error('Failed to save note', error);
-        }
+                const newNote = {
+                    id: newId,
+                    title: title || "No title",
+                    body
+                };
+                const updatedNotes = [newNote, ...existingNotes];
+                await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+                setNotes(updatedNotes);
+            
+                router.replace({ pathname: '/', params: { refresh: Date.now() } });
+            } catch (error) {
+                console.error('Failed to save note', error);
+            }
         } else {
             alert("Please type your notes before you save");
         }
@@ -82,6 +84,7 @@ const styles = StyleSheet.create({
     },
     inputField: {
         padding: 15,
+        pointerEvents: 'auto'
     },
     titleInput: {
         fontSize: 22,
