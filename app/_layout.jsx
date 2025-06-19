@@ -12,6 +12,7 @@ export default function RootLayout() {
     }}>
       <Stack.Screen name="index" options={{
         title: 'Daily Notes',
+        headerBackVisible: false
       }}/>
       <Stack.Screen name="createNote" options={{
         presentation: 'modal',

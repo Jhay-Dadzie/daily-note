@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, FlatList, Pressable, Platform } from "react-native";
-import { Notes } from "@/components/note"
-import { Link, router } from "expo-router"
+import { Link} from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from "expo-router";
+import Animated, { LinearTransition} from "react-native-reanimated";
+import { StatusBar } from 'expo-status-bar';
 
 export default function Index() {
   const { refresh } = useLocalSearchParams()
@@ -54,15 +55,16 @@ export default function Index() {
     };
 
     loadNotes();
-  }, [refresh]); // ✅ Flat dependency
+  }, [refresh]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <FlatList 
+      <Animated.FlatList 
         data={notes}
         contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
         renderItem={renderItem}
         keyExtractor={(notes) => notes.id.toString()}
+        itemLayoutAnimation={LinearTransition}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -97,6 +99,7 @@ export default function Index() {
         
         )
       }
+      <StatusBar style='dark'/>
     </SafeAreaView>
   );
 }

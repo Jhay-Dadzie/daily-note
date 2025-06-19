@@ -1,10 +1,11 @@
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform } from 'react-native';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Notes } from '@/components/note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StatusBar } from 'expo-status-bar';
 
 
 export default function createNote() {
@@ -68,7 +69,7 @@ export default function createNote() {
             </Pressable>
 
         </SafeAreaView>
-        <StatusBar />
+        <StatusBar style='dark'/>
     </Animated.View>
   )    
 }
@@ -105,7 +106,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: '100%',
-        overflow: 'hidden',
         position: 'absolute',
         bottom: 70,
         right: 40
