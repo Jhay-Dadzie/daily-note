@@ -1,12 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView } from 'react-native';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Notes } from '@/components/note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
-
 
 export default function createNote() {
     
@@ -42,35 +41,40 @@ export default function createNote() {
     }
 
   return (
-    <Animated.View
-        entering={SlideInDown}
-        style={styles.container}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-        <SafeAreaView style={styles.inputFieldContainer}>
-            <TextInput placeholder='Enter title' style={[styles.inputField, styles.titleInput]}
-                autoFocus
-                cursorColor={'#ffa400'}
-                value={title}
-                onChangeText={setTitle}
-            />
-            <TextInput placeholder='Write your note here'
-                style={[styles.inputField, styles.bodyInput]}
-                cursorColor={'#ffa400'}
-                multiline
-                value={body}
-                onChangeText={setBody}
-            />
-            <Pressable style={styles.saveButton} onPress={addNote}>
-                <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
-                    <FontAwesome name='plus' size={25} color={'white'}/>
-                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Save Note</Text>
-                </View>
-     
-            </Pressable>
+        <Animated.View
+            entering={SlideInDown}
+            style={styles.container}
+        >
+            <SafeAreaView style={styles.inputFieldContainer}>
+                <TextInput placeholder='Enter title' style={[styles.inputField, styles.titleInput]}
+                    autoFocus
+                    cursorColor={'#ffa400'}
+                    value={title}
+                    onChangeText={setTitle}
+                />
+                <TextInput placeholder='Write your note here'
+                    style={[styles.inputField, styles.bodyInput]}
+                    cursorColor={'#ffa400'}
+                    multiline
+                    value={body}
+                    onChangeText={setBody}
+                />
+                <Pressable style={styles.saveButton} onPress={addNote}>
+                    <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
+                        <FontAwesome name='plus' size={25} color={'white'}/>
+                        <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Save</Text>
+                    </View>
+        
+                </Pressable>
 
-        </SafeAreaView>
-        <StatusBar style='dark'/>
-    </Animated.View>
+            </SafeAreaView>
+            <StatusBar style='dark'/>
+        </Animated.View>
+    </KeyboardAvoidingView>
   )    
 }
 
@@ -107,6 +111,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: '100%',
         position: 'absolute',
+        marginBottom: 40,
         bottom: 70,
         right: 40
     }
