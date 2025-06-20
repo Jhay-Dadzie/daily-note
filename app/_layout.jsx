@@ -18,6 +18,10 @@ export default function RootLayout() {
         presentation: 'modal',
         title: "Create Note",
       }}/>
+      <Stack.Screen name="note/[id]" options={{
+        presentation: 'modal',
+        title: "My Note",
+      }}/>
     </Stack>
   )
 }
