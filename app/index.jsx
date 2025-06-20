@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, FlatList, Pressable, Platform } from "react-native";
-import { Link} from "expo-router"
+import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
-import { useState, useEffect } from "react";
+import { useState, useEffect, Children } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
@@ -20,13 +20,19 @@ export default function Index() {
       console.error("Notes cannot be deleted", error )
     }
   }
+
   const renderItem = ({item}) => {
     return (
       <View style={styles.noteView}>
-        <View style={styles.noteViewContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.body}>{item.body}</Text>
-        </View>
+        <Link href={`/note/${item.id}`} asChild>
+          <Pressable>
+            <View style={styles.noteViewContainer}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.body}>{item.body}</Text>
+            </View>
+          </Pressable>
+        </Link>
+
         <Pressable style={{
           marginRight: 15,
           backgroundColor: 'rgb(50, 49, 49)',
