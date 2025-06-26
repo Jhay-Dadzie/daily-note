@@ -1,0 +1,41 @@
+import { Tabs } from "expo-router";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+
+export default function TabLayout() {
+    return(
+        <Tabs screenOptions={{
+            fontWeight: 'bold',
+            tabBarActiveTintColor: '#ffa400',
+            tabBarInactiveTintColor: '#656768',
+        }}>
+            <Tabs.Screen name="index" options={{
+                title: 'Daily Notes',
+                headerBackVisible: false,
+                tabBarLabel: 'All Notes',
+                tabBarIcon: ({color}) => {
+                    return(
+                        <FontAwesome name="clipboard" size={24} color={color}/>
+                    )
+                }
+            }}/>
+            <Tabs.Screen name="reminder" options={{
+                title: 'Reminders',
+                tabBarLabel: 'Reminders',
+                tabBarIcon: ({color}) => {
+                    return(
+                        <FontAwesome name="bell" size={24} color={color}/>
+                    )
+                }
+            }}/>
+            <Tabs.Screen name="toDo" options={{
+                title: 'To Dos',
+                tabBarLabel: 'To Dos',
+                tabBarIcon: ({color}) => {
+                    return(
+                        <FontAwesome name="check-square-o" size={24} color={color}/>
+                    )
+                }
+            }}/>
+        </Tabs>
+    )
+}
