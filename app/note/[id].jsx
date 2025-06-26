@@ -5,7 +5,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 
-
 export default function NoteScreen() {
   const { id } = useLocalSearchParams();
   const isEditing = id !== 'new';
@@ -37,8 +36,8 @@ export default function NoteScreen() {
 
         if (isEditing) {
             updatedNotes = notes.map(note =>
-                note.id == id ? { ...note, title: title || 'No title', body } : note
-            );
+            note.id == id ? { ...note, title: title || 'No title', body } : note
+        );
         } else {
             const newId = notes.length > 0 ? Math.max(...notes.map(note => note.id)) + 1 : 1;
             const newNote = { id: newId, title: title || 'No title', body };
