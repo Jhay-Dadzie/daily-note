@@ -71,7 +71,7 @@ export default function Index() {
         data={notes}
         contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
         renderItem={renderItem}
-        keyExtractor={(notes) => notes.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         itemLayoutAnimation={LinearTransition}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
