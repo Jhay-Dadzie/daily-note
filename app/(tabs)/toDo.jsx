@@ -7,51 +7,82 @@ import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
 import { StatusBar } from 'expo-status-bar';
 import styles from "@/components/styles/styles";
+import CheckBox from 'expo-checkbox'
 
-export default function Reminder() {
-  const { refresh } = useLocalSearchParams()
-  const [notes, setNotes] = useState([]);
+export default function ToDo() {
+  const { refresh } = useLocalSearchParams
+  const [isChecked, setIsChecked] = useState(false)
+  const [todos, setTodos] = useState([])
 
-  const deleteNote = async (id) => {
-    const filteredNotes = notes.filter(note => note.id !== id);
-    setNotes(filteredNotes);
+  const deleteTodo = async (id) => {
+    const filteredTodo = todos.filter(todo => todo.id !== id)
+    setTodos(filteredTodo)
     try {
-      await AsyncStorage.setItem("notes", JSON.stringify(filteredNotes))
+      await AsyncStorage.setItem('todos', JSON.stringify(filteredTodo))
     } catch(error) {
-      console.error("Notes cannot be deleted", error )
+      console.error("Cannot delete todo", error)
     }
   }
 
-  const renderItem = ({item}) => {
-    return (
-      <View style={styles.noteView}>
-        <Link href={`/note/${item.id}`} asChild>
-          <Pressable>
-            <View style={styles.noteViewContainer}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.body}>{item.body}</Text>
-            </View>
-          </Pressable>
-        </Link>
+  useEffect(() => {
+    const loadTodos = async () => {
+      try {
+        const savedTodos = await AsyncStorage.getItem('todos')
+        if (savedTodos) {
+          setTodos(JSON.parse(savedTodos).sort((a, b) => b.id - a.id))
+        } else {
+          setTodos([])
+        }
 
-        <Pressable style={{
-            marginRight: 15,
-          }}
-          onPress={() => deleteNote(item.id)}
-        >
-          <FontAwesome name="trash" size={22} color={'#ffa400'}/>
-        </Pressable>
-      </View>
-    )
-  }
+      } catch (error) {
+        console.error('Cant load todos:', error)
+      }
+    }
+    loadTodos()
+  }, [refresh])
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Animated.FlatList 
-        data={notes}
-        contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
-        renderItem={renderItem}
-        keyExtractor={(notes) => notes.id.toString()}
+        data={todos}
+        contentContainerStyle={todos.length === 0 ? styles.emptyListContainer : null}
+        renderItem={({item}) => {
+          return (
+            <View style={styles.noteView}>
+              
+              <Pressable style={{flex: 1}}>
+                <View>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <CheckBox
+                      style={{
+                        marginRight: 10
+                      }}
+                      value={isChecked}
+                      onValueChange={setIsChecked}
+                      color={isChecked ? '#ffa400' : undefined}
+                    />
+                    <Text style={styles.title}>
+                      {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
+                    </Text>
+
+                  </View>
+                  <Text style={styles.body}>
+                    {item.body.length > 100 ? item.body.slice(0, 100) + '.....' : item.body}
+                  </Text>
+                </View>
+              </Pressable>
+
+              <Pressable style={{
+                  marginRight: 15,
+                }}
+                onPress={() => deleteTodo(item.id)}
+              >
+                <FontAwesome name="trash" size={22} color={'#ffa400'}/>
+              </Pressable>
+            </View>
+          )
+        }}
+        keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
         itemLayoutAnimation={LinearTransition}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
@@ -64,7 +95,7 @@ export default function Reminder() {
               <Text style={styles.emptyTitle}>No to-dos</Text>
               <Text style={styles.emptySubtitle}>To-dos created will appear here</Text>
             </View>
-            <Link href={'/createNote'} asChild>
+            <Link href={'/createTodo'} asChild>
               <Pressable style={styles.createNoteButton}>
                 <FontAwesome name="plus" size={18} color={'white'}/>
                 <Text style={styles.createButtonText}>Create TO-DO</Text>
@@ -75,12 +106,12 @@ export default function Reminder() {
       />
 
       {
-        notes.length > 0 && (
-          <Link href={"/createNote"} asChild>
+        todos.length > 0 && (
+          <Link href={"/createTodo"} asChild>
             <Pressable style={styles.addNoteButton}>
               <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
                   <FontAwesome name='plus' size={25} color={'white'}/>
-                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Create Note</Text>
+                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Add To-do</Text>
               </View>
             </Pressable>
           </Link>
