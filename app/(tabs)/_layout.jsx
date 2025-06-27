@@ -7,10 +7,10 @@ export default function TabLayout() {
             fontWeight: 'bold',
             tabBarActiveTintColor: '#ffa400',
             tabBarInactiveTintColor: '#656768',
+            headerBackVisible: false,
         }}>
             <Tabs.Screen name="index" options={{
                 title: 'Daily Notes',
-                headerBackVisible: false,
                 tabBarLabel: 'All Notes',
                 tabBarIcon: ({color}) => {
                     return(
