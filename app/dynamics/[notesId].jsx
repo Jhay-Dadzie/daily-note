@@ -76,7 +76,7 @@ export default function NoteScreen() {
         />
         <Pressable
             onPress={saveNote}
-            style={createPageStyles.updateButton}
+            style={createPageStyles.saveButton}
         >
             <View style={{ alignItems: 'center' }}>
                 <FontAwesome name='save' size={22} color="white" />
