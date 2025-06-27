@@ -15,7 +15,7 @@ export default function RootLayout() {
         title: "Create Note",
       }}/>
       
-      <Stack.Screen name="note/[id]" options={{
+      <Stack.Screen name="dynamics/[notesId]" options={{
         presentation: 'modal',
         title: "My Note",
       }}/>
