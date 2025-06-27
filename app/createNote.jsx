@@ -6,6 +6,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Notes } from '@/components/note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
+import createPageStyles from '@/components/styles/createPageStyles';
 
 export default function createNote() {
     
@@ -18,12 +19,8 @@ export default function createNote() {
             try {
                 const savedNotes = await AsyncStorage.getItem('notes');
                 const existingNotes = savedNotes ? JSON.parse(savedNotes) : [];
-                
-                const newId = existingNotes.length > 0 
-                    ? Math.max(...existingNotes.map(note => note.id)) + 1 : 1;
-
                 const newNote = {
-                    id: newId,
+                    id: Date.now(),
                     title: title || "No title",
                     body
                 };
@@ -47,23 +44,23 @@ export default function createNote() {
     >
         <Animated.View
             entering={SlideInDown}
-            style={styles.container}
+            style={createPageStyles.container}
         >
-            <SafeAreaView style={styles.inputFieldContainer}>
-                <TextInput placeholder='Enter title' style={[styles.inputField, styles.titleInput]}
+            <SafeAreaView style={createPageStyles.inputFieldContainer}>
+                <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
                     autoFocus
                     cursorColor={'#ffa400'}
                     value={title}
                     onChangeText={setTitle}
                 />
                 <TextInput placeholder='Write your note here'
-                    style={[styles.inputField, styles.bodyInput]}
+                    style={[createPageStyles.inputField, createPageStyles.bodyInput]}
                     cursorColor={'#ffa400'}
                     multiline
                     value={body}
                     onChangeText={setBody}
                 />
-                <Pressable style={styles.saveButton} onPress={addNote}>
+                <Pressable style={createPageStyles.saveButton} onPress={addNote}>
                     <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
                         <FontAwesome name='plus' size={25} color={'white'}/>
                         <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Save</Text>
@@ -77,43 +74,3 @@ export default function createNote() {
     </KeyboardAvoidingView>
   )    
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    inputFieldContainer: {
-        flex: 1,
-        flexDirection: 'column',
-        position: 'relative'
-    },
-    inputField: {
-        padding: 15,
-        pointerEvents: 'auto'
-    },
-    titleInput: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#656768'
-    },
-    bodyInput: {
-        fontSize: 16,
-        color: '#717272',
-        flex: 1,
-        textAlignVertical: 'top'
-    },
-    saveButton: {
-        backgroundColor: '#ffa400',
-        width: 70,
-        paddingVertical: 10,
-        paddingHorizontal: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: '100%',
-        position: 'absolute',
-        marginBottom: 40,
-        bottom: 70,
-        right: 40
-    }
-
-})
