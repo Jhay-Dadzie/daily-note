@@ -24,10 +24,10 @@ const createPageStyles = StyleSheet.create({
         flex: 1,
         textAlignVertical: 'top'
     },
-    updateButton: {
+    saveButton: {
         backgroundColor: '#ffa400',
-        paddingVertical: 15,
-        paddingHorizontal: 15,
+        paddingVertical: 10,
+        paddingHorizontal: 18,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: '100%',
