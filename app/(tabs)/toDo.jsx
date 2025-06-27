@@ -95,7 +95,7 @@ export default function ToDo() {
               <Text style={styles.emptyTitle}>No to-dos</Text>
               <Text style={styles.emptySubtitle}>To-dos created will appear here</Text>
             </View>
-            <Link href={'/createTodo'} asChild>
+            <Link href={'/createToDo'} asChild>
               <Pressable style={styles.createNoteButton}>
                 <FontAwesome name="plus" size={18} color={'white'}/>
                 <Text style={styles.createButtonText}>Create TO-DO</Text>
@@ -107,7 +107,7 @@ export default function ToDo() {
 
       {
         todos.length > 0 && (
-          <Link href={"/createTodo"} asChild>
+          <Link href={"/createToDo"} asChild>
             <Pressable style={styles.addNoteButton}>
               <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
                   <FontAwesome name='plus' size={25} color={'white'}/>

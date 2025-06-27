@@ -14,7 +14,7 @@ export default function RootLayout() {
         presentation: 'modal',
         title: "Create Reminder",
       }}/>
-      <Stack.Screen name="createTodo" options={{
+      <Stack.Screen name="createToDo" options={{
         presentation: 'modal',
         title: "Create Todo",
       }}/>
