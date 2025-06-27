@@ -28,8 +28,12 @@ export default function Index() {
         <Link href={`/dynamics/${item.id}`} asChild>
           <Pressable style={{flex: 1}}>
             <View>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.body}>{item.body}</Text>
+              <Text style={styles.title}>
+                {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
+              </Text>
+              <Text style={styles.body}>
+                {item.body.length > 200 ? item.body.slice(0, 200) + '.....' : item.body}
+              </Text>
             </View>
           </Pressable>
         </Link>
