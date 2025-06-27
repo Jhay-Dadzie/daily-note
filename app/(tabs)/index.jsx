@@ -26,8 +26,8 @@ export default function Index() {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/${item.id}`} asChild>
-          <Pressable>
-            <View style={styles.noteViewContainer}>
+          <Pressable style={{flex: 1}}>
+            <View>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.body}>{item.body}</Text>
             </View>
@@ -69,6 +69,7 @@ export default function Index() {
         renderItem={renderItem}
         keyExtractor={(notes) => notes.id.toString()}
         itemLayoutAnimation={LinearTransition}
+        showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
