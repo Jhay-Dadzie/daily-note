@@ -10,8 +10,7 @@ import styles from "@/components/styles/styles";
 import CheckBox from 'expo-checkbox'
 
 export default function ToDo() {
-  const { refresh } = useLocalSearchParams
-  const [isChecked, setIsChecked] = useState(false)
+  const { refresh } = useLocalSearchParams()
   const [todos, setTodos] = useState([])
 
   const deleteTodo = async (id) => {
@@ -22,6 +21,50 @@ export default function ToDo() {
     } catch(error) {
       console.error("Cannot delete todo", error)
     }
+  }
+
+  const renderItem = ({item}) => {
+    return (
+      <View style={styles.noteView}>
+        <Link href={`dynamics/todoRoute/${item.id}`} asChild>
+          <Pressable style={{flex: 1}}>
+            <View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <CheckBox
+                  style={{
+                    marginRight: 10
+                  }}
+                  value={item.isChecked || false}
+                  onValueChange={(newValue) => {
+                    const updatedTodos = todos.map(todo => 
+                      todo.id === item.id ? {...todo, isChecked: newValue} : todo
+                    );
+                    setTodos(updatedTodos);
+                    AsyncStorage.setItem('todos', JSON.stringify(updatedTodos));
+                  }}
+                  color={item.isChecked ? '#ffa400' : undefined}
+                />
+                <Text style={styles.title}>
+                  {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
+                </Text>
+
+              </View>
+              <Text style={styles.body}>
+                {item.body.length > 100 ? item.body.slice(0, 100) + '.....' : item.body}
+              </Text>
+            </View>
+          </Pressable>
+        </Link>
+
+        <Pressable style={{
+            marginRight: 15,
+          }}
+          onPress={() => deleteTodo(item.id)}
+        >
+          <FontAwesome name="trash" size={22} color={'#ffa400'}/>
+        </Pressable>
+      </View>
+    )
   }
 
   useEffect(() => {
@@ -46,42 +89,7 @@ export default function ToDo() {
       <Animated.FlatList 
         data={todos}
         contentContainerStyle={todos.length === 0 ? styles.emptyListContainer : null}
-        renderItem={({item}) => {
-          return (
-            <View style={styles.noteView}>
-              
-              <Pressable style={{flex: 1}}>
-                <View>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <CheckBox
-                      style={{
-                        marginRight: 10
-                      }}
-                      value={isChecked}
-                      onValueChange={setIsChecked}
-                      color={isChecked ? '#ffa400' : undefined}
-                    />
-                    <Text style={styles.title}>
-                      {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
-                    </Text>
-
-                  </View>
-                  <Text style={styles.body}>
-                    {item.body.length > 100 ? item.body.slice(0, 100) + '.....' : item.body}
-                  </Text>
-                </View>
-              </Pressable>
-
-              <Pressable style={{
-                  marginRight: 15,
-                }}
-                onPress={() => deleteTodo(item.id)}
-              >
-                <FontAwesome name="trash" size={22} color={'#ffa400'}/>
-              </Pressable>
-            </View>
-          )
-        }}
+        renderItem={renderItem}
         keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
         itemLayoutAnimation={LinearTransition}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
