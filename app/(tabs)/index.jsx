@@ -25,7 +25,7 @@ export default function Index() {
   const renderItem = ({item}) => {
     return (
       <View style={styles.noteView}>
-        <Link href={`/dynamics/${item.id}`} asChild>
+        <Link href={`/dynamics/noteRoute/${item.id}`} asChild>
           <Pressable style={{flex: 1}}>
             <View>
               <Text style={styles.title}>
