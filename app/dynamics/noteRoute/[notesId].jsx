@@ -36,13 +36,15 @@ export default function NoteScreen() {
         let updatedNotes = [];
 
         if (isEditing) {
-            updatedNotes = notes.map(note =>
-                note.id == notesId ? { ...note, title: title || 'No title', body } : note
-            );
+          updatedNotes = notes.map(note => (
+            note.id == notesId 
+            ? { ...note, title: title || 'No title', body } 
+            : note
+          ));
         } else {
-            const newId = notes.length > 0 ? Math.max(...notes.map(note => note.id)) + 1 : 1;
-            const newNote = { id: newId, title: title || 'No title', body };
-            updatedNotes = [newNote, ...notes];
+          const newId = Date.now()
+          const newNote = { id: newId, title: title || 'No title', body };
+          updatedNotes = [newNote, ...notes];
         }
 
         await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
@@ -58,7 +60,7 @@ export default function NoteScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-        <SafeAreaView style={createPageStyles.inputFieldContainer}>
+      <SafeAreaView style={createPageStyles.inputFieldContainer}>
         <TextInput
             placeholder="Enter title"
             value={title}
@@ -76,7 +78,7 @@ export default function NoteScreen() {
         />
         <Pressable
             onPress={saveNote}
-            style={createPageStyles.saveButton}
+            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15} ]}
         >
             <View style={{ alignItems: 'center' }}>
                 <FontAwesome name='save' size={22} color="white" />
@@ -86,7 +88,7 @@ export default function NoteScreen() {
             </View>
         </Pressable>
         <StatusBar style='dark' />
-        </SafeAreaView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
