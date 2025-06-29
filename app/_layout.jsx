@@ -1,5 +1,4 @@
 import { Stack } from "expo-router";
-
 export default function RootLayout() {
   return (
     <Stack>
@@ -19,12 +18,15 @@ export default function RootLayout() {
         title: "Create Todo",
       }}/>
       
-      <Stack.Screen name="dynamics/[notesId]" options={{
+      <Stack.Screen name="dynamics/noteRoute/[notesId]" options={{
         presentation: 'modal',
         title: "My Note",
       }}/>
-      
-      
+      <Stack.Screen name="dynamics/todoRoute/[todosId]" options={{
+        presentation: 'modal',
+        title: "My Todo",
+      }}/>
+ 
     </Stack>
   )
 }
