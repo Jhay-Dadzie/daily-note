@@ -36,10 +36,6 @@ const createPageStyles = StyleSheet.create({
         bottom: 70,
         right: 40
 
-    },
-    updateButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 10,
     }
 
 })
