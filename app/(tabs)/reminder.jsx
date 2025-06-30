@@ -10,22 +10,37 @@ import styles from "@/components/styles/styles";
 
 export default function Reminder() {
   const { refresh } = useLocalSearchParams()
-  const [notes, setNotes] = useState([]);
+  const [title, setTitle] = useState("")
+  const [body, setBody] = useState("")
+  const [reminders, setReminders] = useState([]);
 
   const deleteNote = async (id) => {
-    const filteredNotes = notes.filter(note => note.id !== id);
-    setNotes(filteredNotes);
-    try {
-      await AsyncStorage.setItem("notes", JSON.stringify(filteredNotes))
-    } catch(error) {
-      console.error("Notes cannot be deleted", error )
-    }
+    
   }
+
+  useEffect(() => {
+    const loadReminders = async () => {
+      try{
+        const savedReminders = await AsyncStorage.getItem('reminders')
+        const parsedReminders = savedReminders ? JSON.parse(savedReminders) : savedReminders;
+        if(parsedReminders) {
+          setReminders(parsedReminders.sort((a,b) => b.id - a.id))
+        } else {
+          setReminders([])
+        }
+      } catch(error) {
+        console.error("Error", error)
+      }
+      
+    }
+
+    loadReminders()
+  }, [refresh])
 
   const renderItem = ({item}) => {
     return (
       <View style={styles.noteView}>
-        <Link href={`/note/${item.id}`} asChild>
+        <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
           <Pressable>
             <View style={styles.noteViewContainer}>
               <Text style={styles.title}>{item.title}</Text>
@@ -48,10 +63,10 @@ export default function Reminder() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Animated.FlatList 
-        data={notes}
-        contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
+        data={reminders}
+        contentContainerStyle={reminders.length === 0 ? styles.emptyListContainer : null}
         renderItem={renderItem}
-        keyExtractor={(notes) => notes.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         itemLayoutAnimation={LinearTransition}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
@@ -75,12 +90,17 @@ export default function Reminder() {
       />
 
       {
-        notes.length > 0 && (
+        reminders.length > 0 && (
           <Link href={"/createReminder"} asChild>
             <Pressable style={styles.addNoteButton}>
               <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
                   <FontAwesome name='plus' size={25} color={'white'}/>
-                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Create Note</Text>
+                  <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Add</Text>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Reminder</Text>
+                    
+                  </View>
+                  
               </View>
             </Pressable>
           </Link>
