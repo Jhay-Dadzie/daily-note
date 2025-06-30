@@ -9,7 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
 
 export default function createToDo() {
-  const [title, setTitle] = useState("")
+    const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
     const [todos, setTodos] = useState(Todos.sort((a,b) => b.id - a.id)|| [])
 
