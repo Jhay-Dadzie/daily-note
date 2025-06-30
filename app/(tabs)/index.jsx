@@ -120,7 +120,7 @@ export default function Index() {
             <Pressable style={styles.addNoteButton}>
               <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
                   <FontAwesome name='plus' size={25} color={'white'}/>
-                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Create Note</Text>
+                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Add Note</Text>
               </View>
             </Pressable>
           </Link>
