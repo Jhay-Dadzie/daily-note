@@ -35,9 +35,7 @@ const createPageStyles = StyleSheet.create({
         marginBottom: 40,
         bottom: 70,
         right: 40
-
     }
-
 })
 
 export default createPageStyles
