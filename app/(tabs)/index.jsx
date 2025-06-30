@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Alert } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
@@ -13,13 +13,32 @@ export default function Index() {
   const [notes, setNotes] = useState([]);
 
   const deleteNote = async (id) => {
-    const filteredNotes = notes.filter(note => note.id !== id);
-    setNotes(filteredNotes);
-    try {
-      await AsyncStorage.setItem("notes", JSON.stringify(filteredNotes))
-    } catch(error) {
-      console.error("Notes cannot be deleted", error )
-    }
+    Alert.alert("Delete", "Are you sure you want to delete?",
+      [
+        {
+          text: "NO",
+          onPress: () => null,
+          style: "cancel"
+        },
+        {
+          text: "DELETE",
+          onPress: async () => {
+            const filteredNotes = notes.filter(note => note.id !== id);
+            setNotes(filteredNotes);
+            try {
+              await AsyncStorage.setItem("notes", JSON.stringify(filteredNotes))
+            } catch(error) {
+              console.error("Notes cannot be deleted", error )
+            }
+          },
+          style: "destructive"
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => null
+      }
+    )
   }
 
   const renderItem = ({item}) => {
