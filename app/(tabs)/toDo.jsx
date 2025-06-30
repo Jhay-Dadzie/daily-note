@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
@@ -14,18 +14,38 @@ export default function ToDo() {
   const [todos, setTodos] = useState([])
 
   const deleteTodo = async (id) => {
-    const filteredTodo = todos.filter(todo => todo.id !== id)
-    setTodos(filteredTodo)
-    try {
-      await AsyncStorage.setItem('todos', JSON.stringify(filteredTodo))
-    } catch(error) {
-      console.error("Cannot delete todo", error)
-    }
+    Alert.alert("DELETE", "Are you sure you want to delete?",
+      [
+        {
+          text: "NO",
+          onPress: () => null,
+          style: 'cancel'
+        },
+        {
+          text: "DELETE",
+          onPress: async () => {
+            const filteredTodo = todos.filter(todo => todo.id !== id)
+            setTodos(filteredTodo)
+            try {
+              await AsyncStorage.setItem('todos', JSON.stringify(filteredTodo))
+            } catch(error) {
+              console.error("Cannot delete todo", error)
+            }
+          },
+          style: 'destructive'
+        }
+      ],
+      {
+        cancelable: true,
+        onPress: () => null
+      }
+    )
+    
   }
 
   const renderItem = ({item}) => {
     return (
-      <View style={styles.noteView}>
+      <View style={[styles.noteView, item.isChecked && {opacity: 0.5}]}>
         <Link href={`dynamics/todoRoute/${item.id}`} asChild>
           <Pressable style={{flex: 1}}>
             <View>
@@ -44,14 +64,21 @@ export default function ToDo() {
                   }}
                   color={item.isChecked ? '#ffa400' : undefined}
                 />
-                <Text style={styles.title}>
+                <Text style={[styles.title, item.isChecked && {textDecorationLine: 'line-through'}]}>
                   {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
                 </Text>
 
               </View>
-              <Text style={styles.body}>
+              <Text style={[styles.body, item.isChecked && {textDecorationLine: 'line-through'}]}>
                 {item.body.length > 100 ? item.body.slice(0, 100) + '.....' : item.body}
               </Text>
+              {
+                item.isChecked && (
+                  <View>
+                    <Text style={{color: 'red'}}>Completed</Text>
+                  </View>
+                )
+              }
             </View>
           </Pressable>
         </Link>
