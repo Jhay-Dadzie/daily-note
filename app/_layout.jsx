@@ -26,6 +26,10 @@ export default function RootLayout() {
         presentation: 'modal',
         title: "My Todo",
       }}/>
+      <Stack.Screen name="dynamics/reminderRoute/[remindersId]" options={{
+        presentation: 'modal',
+        title: "My Reminder",
+      }}/>
  
     </Stack>
   )
