@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
@@ -15,6 +15,33 @@ export default function Reminder() {
   const [reminders, setReminders] = useState([]);
 
   const deleteNote = async (id) => {
+    Alert.alert("Delete", "Are you sure you want to delete?", 
+      [
+        {
+          text: "NO",
+          onPress: () => null,
+          style: "cancel"
+        },
+        {
+          text: "DELETE",
+          onPress: async () => {
+            const filteredReminders = reminders.filter(reminder => reminder.id !== id)
+            setReminders(filteredReminders)
+            try {
+              await AsyncStorage.setItem('reminders', JSON.stringify(filteredReminders))
+            } catch(error) {
+              console.error("Reminder could not be deleted", error)
+            }
+          },
+          style: "destructive"
+        }
+
+      ],
+      {
+        cancelable: true,
+        style: "cancel"
+      }
+    )
     
   }
 
