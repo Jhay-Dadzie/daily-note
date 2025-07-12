@@ -37,32 +37,27 @@ export default function Reminder() {
         }
 
       ],
-      {
-        cancelable: true,
-        style: "cancel"
-      }
+      {cancelable: true}
     )
     
   }
 
   useEffect(() => {
     const loadReminders = async () => {
-      try{
-        const savedReminders = await AsyncStorage.getItem('reminders')
-        const parsedReminders = savedReminders ? JSON.parse(savedReminders) : savedReminders;
-        if(parsedReminders) {
-          setReminders(parsedReminders.sort((a,b) => b.id - a.id))
+      try {
+        const savedReminders = await AsyncStorage.getItem('reminders');
+        if (savedReminders) {
+          setReminders(JSON.parse(savedReminders).sort((a, b) => b.id - a.id));
         } else {
-          setReminders([])
+          setReminders([]);
         }
-      } catch(error) {
-        console.error("Error", error)
+      } catch (error) {
+        console.error('Failed to load notes', error);
       }
-      
-    }
+    };
 
-    loadReminders()
-  }, [refresh])
+    loadReminders();
+  }, [refresh]);
 
   const renderItem = ({item}) => {
     return (
@@ -93,8 +88,8 @@ export default function Reminder() {
         data={reminders}
         contentContainerStyle={reminders.length === 0 ? styles.emptyListContainer : null}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        itemLayoutAnimation={LinearTransition}
+        keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
+        layoutAnimation={LinearTransition}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
