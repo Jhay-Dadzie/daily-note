@@ -68,7 +68,7 @@ export default function Reminder() {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
-          <Pressable>
+          <Pressable style={{flex: 1}}>
             <View style={styles.noteViewContainer}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.body}>{item.body}</Text>
