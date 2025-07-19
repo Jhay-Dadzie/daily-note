@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Todos } from '@/components/toDo';
@@ -32,7 +32,7 @@ export default function createToDo() {
                 console.error('Failed to save todo', error);
             }
         } else {
-            alert("Please type your todos before you save");
+            Alert.alert("Empty", "Please type your todos before you save");
         }
     }
 
