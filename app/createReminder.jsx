@@ -47,7 +47,8 @@ export default function createReminder(){
     }
     
     setSelectedDate(finalDate);
-    setAlarm(finalDate.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'}));
+    const schedule = finalDate.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
+    setAlarm(schedule);
     setShowReminderOptions(false);
     setShowMode('date');
   }
@@ -61,7 +62,8 @@ export default function createReminder(){
         const newReminder = {
           id: Date.now(),
           title: title || "No title",
-          body
+          body,
+          schedule: alarm
         }
 
         const updatedReminders = [newReminder, ...existingReminders]
@@ -195,7 +197,7 @@ export default function createReminder(){
                         alignItems: 'center'
                       }}
                     >
-                      <Text style={{color: 'white', fontWeight: 'bold'}}>Confirm Time</Text>
+                      <Text style={{color: 'white', fontWeight: 'bold'}}>Set Reminder</Text>
                     </Pressable>
                     <Pressable 
                       onPress={() => setShowMode('date')}
