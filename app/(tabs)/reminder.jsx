@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert, TouchableHighlight } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
@@ -10,8 +10,6 @@ import styles from "@/components/styles/styles";
 
 export default function Reminder() {
   const { refresh } = useLocalSearchParams()
-  const [title, setTitle] = useState("")
-  const [body, setBody] = useState("")
   const [reminders, setReminders] = useState([]);
 
   const deleteNote = async (id) => {
@@ -63,12 +61,15 @@ export default function Reminder() {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
-          <Pressable style={{flex: 1}}>
+          <TouchableHighlight underlayColor={"#faf2e2ff"} style={{flex: 1}}>
             <View style={styles.noteViewContainer}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.body}>{item.body}</Text>
+              <View style={reminderStyles.scheduleContainer}>
+                <Text style={reminderStyles.schedule}>{item.schedule}</Text>
+              </View>
             </View>
-          </Pressable>
+          </TouchableHighlight>
         </Link>
 
         <Pressable style={{
@@ -133,3 +134,16 @@ export default function Reminder() {
     </SafeAreaView>
   );
 }
+
+const reminderStyles = StyleSheet.create({
+  scheduleContainer: {
+    backgroundColor: "#d8d8d6ff",
+    display: "flex",
+    borderRadius: 9,
+    opacity: 0.5,
+    padding: 8,
+    marginTop: 15,
+    width: "45%",
+    alignItems: 'center'
+  },
+})
