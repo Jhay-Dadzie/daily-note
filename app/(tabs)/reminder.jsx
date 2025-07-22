@@ -7,6 +7,7 @@ import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
 import { StatusBar } from 'expo-status-bar';
 import styles from "@/components/styles/styles";
+import {PushNotification} from '@/components/pushNotification'
 
 export default function Reminder() {
   const { refresh } = useLocalSearchParams()
@@ -23,6 +24,11 @@ export default function Reminder() {
         {
           text: "DELETE",
           onPress: async () => {
+            const reminderToDelete = reminders.find(reminder => reminder.id === id);
+          
+            if (reminderToDelete?.notificationId) {
+              await PushNotification.cancel(reminderToDelete.notificationId);
+            }
             const filteredReminders = reminders.filter(reminder => reminder.id !== id)
             setReminders(filteredReminders)
             try {
@@ -57,16 +63,25 @@ export default function Reminder() {
     loadReminders();
   }, [refresh]);
 
+
   const renderItem = ({item}) => {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
           <TouchableHighlight underlayColor={"#faf2e2ff"} style={{flex: 1}}>
             <View style={styles.noteViewContainer}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.body}>{item.body}</Text>
+              <Text style={styles.title}>
+                {item.title.length > 50 ? item.title.slice(0, 50) + '....' : item.title}
+              </Text>
+              <Text style={styles.body}>
+                {item.body.length > 150 ? item.body.slice(0, 150) + '....' : item.body}
+              </Text>
               <View style={reminderStyles.scheduleContainer}>
-                <Text style={reminderStyles.schedule}>{item.schedule}</Text>
+                <Text style={reminderStyles.schedule}>
+                  {
+                    item.schedule ? new Date(item.schedule).toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'}) : 'No date set'
+                  }
+                </Text>
               </View>
             </View>
           </TouchableHighlight>
