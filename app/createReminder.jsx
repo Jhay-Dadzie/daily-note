@@ -9,7 +9,8 @@ import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
-import DateTimePicker from '@react-native-community/datetimepicker'
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { PushNotification } from '@/components/pushNotification'
 
 export default function createReminder(){
 
@@ -22,7 +23,7 @@ export default function createReminder(){
   const [body, setBody] = useState("")
   const [reminders, setReminders] = useState(Reminders.sort((a,b) => b.id - a.id))
 
-  const [alarm, setAlarm] = useState("Set Reminder")
+  const [alarm, setAlarm] = useState(null)
   const [showReminderOptions, setShowReminderOptions] = useState(false)
   const [showMode, setShowMode] = useState('date')
   const [selectedDate, setSelectedDate] = useState(today)
@@ -47,12 +48,11 @@ export default function createReminder(){
     }
     
     setSelectedDate(finalDate);
-    const schedule = finalDate.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
-    setAlarm(schedule);
+
+    setAlarm(finalDate);
     setShowReminderOptions(false);
     setShowMode('date');
   }
-
 
   const addReminder = async () => {
     if(body.trim()) {
@@ -63,8 +63,16 @@ export default function createReminder(){
           id: Date.now(),
           title: title || "No title",
           body,
-          schedule: alarm
+          schedule: alarm,
+          notificationId: null
         }
+
+        const notificationId = await PushNotification.schedule({
+          ...newReminder,
+          schedule: new Date(alarm)
+        });
+      
+        newReminder.notificationId = notificationId;
 
         const updatedReminders = [newReminder, ...existingReminders]
         await AsyncStorage.setItem("reminders", JSON.stringify(updatedReminders))
@@ -96,7 +104,12 @@ export default function createReminder(){
           >
           <View style={styles.setReminderBox}>
             <Ionicons name="alarm" size={16}/>
-            <Text style={{marginLeft: 10, fontWeight: "600"}}>{alarm}</Text>
+            <Text style={{marginLeft: 10, fontWeight: "600"}}>
+              {
+                alarm ? alarm.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'}) :
+                "Set Reminder"
+              }
+            </Text>
           </View>
         </Pressable>
 
