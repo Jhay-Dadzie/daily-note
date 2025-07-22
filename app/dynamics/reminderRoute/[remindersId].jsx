@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { SlideInDown } from 'react-native-reanimated';
@@ -8,7 +8,8 @@ import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
-import DateTimePicker from '@react-native-community/datetimepicker'
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { PushNotification } from '@/components/pushNotification'
 
 export default function RemindersScreen() {
   const { remindersId } = useLocalSearchParams()
@@ -22,7 +23,7 @@ export default function RemindersScreen() {
   const [body, setBody] = useState("")
   const [reminders, setReminders] = useState([])
   
-  const [alarm, setAlarm] = useState("Set Reminder")
+  const [alarm, setAlarm] = useState(null)
   const [showReminderOptions, setShowReminderOptions] = useState(false)
   const [showMode, setShowMode] = useState('date')
   const [selectedDate, setSelectedDate] = useState(today)
@@ -42,7 +43,10 @@ export default function RemindersScreen() {
         if(reminder) {
           setBody(reminder.body)
           setTitle(reminder.title)
-          setAlarm(reminder.schedule || "Set Reminder")
+          const reminderDate = new Date(reminder.schedule);
+          setAlarm(reminderDate);
+          setSelectedDate(reminderDate);
+          setSelectedTime(reminderDate);
         }
       }
     };
@@ -64,10 +68,10 @@ export default function RemindersScreen() {
       Alert.alert("Invalid Time", "Please select a future time for today's reminder");
       return;
     }
+    //const schedule = finalDate.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
     
     setSelectedDate(finalDate);
-    const schedule = finalDate.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
-    setAlarm(schedule);
+    setAlarm(finalDate);
     setShowReminderOptions(false);
     setShowMode('date');
   }
@@ -77,18 +81,41 @@ export default function RemindersScreen() {
       let updatedReminders = []
       
       if (isEditing) {
+        const existingReminder = reminders.find(r => r.id == remindersId);
+        if (existingReminder?.notificationId) {
+          await PushNotification.cancel(existingReminder.notificationId);
+        }
+
         updatedReminders = reminders.map(reminder => (
           reminder.id == remindersId ? 
-          {...reminder, title: title || "No title", body, schedule: alarm} : 
+          {...reminder,
+            title: title || "No title",
+            body,
+            schedule: alarm.getTime(),
+            notificationId: null
+          } : 
           reminder
         ))
+
+        const updatedReminder = updatedReminders.find(r => r.id == remindersId);
+        updatedReminder.notificationId = await PushNotification.schedule({
+          ...updatedReminder,
+          schedule: alarm
+        });
+
       } else {
         const newReminder = {
           id: Date.now(),
           title: title || "No title",
           body,
-          schedule: alarm
+          schedule: alarm.getTime(),
+          notificationId: null
         }
+
+        newReminder.notificationId = await PushNotification.schedule({
+          ...newReminder,
+          schedule: alarm
+        });
         updatedReminders = [newReminder, ...reminders]
       }
 
@@ -114,7 +141,12 @@ export default function RemindersScreen() {
         }}>
           <View style={styles.setReminderBox}>
             <Ionicons name="alarm" size={16}/>
-            <Text style={{marginLeft: 10, fontWeight: "600"}}>{alarm}</Text>
+            <Text style={{marginLeft: 10, fontWeight: "600"}}>
+              {
+                alarm ? alarm.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
+                : "Set Reminder"
+              }
+            </Text>
           </View>
         </Pressable>
 
