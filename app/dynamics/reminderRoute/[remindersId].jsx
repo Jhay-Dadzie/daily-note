@@ -59,6 +59,7 @@ export default function RemindersScreen() {
     finalDate.setHours(selectedTime.getHours());
     finalDate.setMinutes(selectedTime.getMinutes());
     finalDate.setSeconds(0);
+    finalDate.setMilliseconds(0)
 
     const now = new Date();
     const isToday = finalDate.toDateString() === now.toDateString();
@@ -77,9 +78,14 @@ export default function RemindersScreen() {
   }
 
   const saveReminder = async () => {
-    if(body.trim()) {
-      let updatedReminders = []
+    if(body.trim()) { 
+      if (!alarm || alarm.getTime() <= new Date().getTime()) {
+        Alert.alert("Empty Reminder Time", "Please set a future time for your reminder");
+        return;
+      }
       
+      let updatedReminders = []
+
       if (isEditing) {
         const existingReminder = reminders.find(r => r.id == remindersId);
         if (existingReminder?.notificationId) {
@@ -156,7 +162,7 @@ export default function RemindersScreen() {
             style={{
               position: 'absolute',
               top: 0, bottom: 0, left: 0, right: 0,
-              backgroundColor: 'rgba(0,0,0,0.7)',
+              backgroundColor: 'rgba(0,0,0,0.8)',
               justifyContent: 'center',
               alignItems: 'center',
               zIndex: 10
