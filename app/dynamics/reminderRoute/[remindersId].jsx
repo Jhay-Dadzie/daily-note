@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, Alert } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, Alert, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { SlideInDown } from 'react-native-reanimated';
@@ -14,6 +14,7 @@ import { PushNotification } from '@/components/pushNotification'
 export default function RemindersScreen() {
   const { remindersId } = useLocalSearchParams()
   const isEditing = remindersId !== 'new';
+  const [isReading, setIsReading] = useState(false)
 
   let today = new Date();
   let timeToRemind = new Date(today.getTime() + 60 * 1000)
@@ -141,6 +142,16 @@ export default function RemindersScreen() {
         entering={SlideInDown}
         style={createPageStyles.container}
       >
+        <View>
+          <TouchableOpacity 
+            style={[createPageStyles.viewMode, isReading && {backgroundColor: '#ffa400'}]} 
+            onPress={() => setIsReading((previous) => previous = !previous)}
+          >
+            <Text style={[{fontWeight: 600}, isReading && {color: 'white'}]}>
+              {isReading ? "Edit mode" : "Read mode"}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <Pressable style={styles.setReminderContainer} onPress={() => {
           setShowReminderOptions(true)
           setShowMode('date')
@@ -281,6 +292,7 @@ export default function RemindersScreen() {
             cursorColor={'#ffa400'}
             value={title}
             onChangeText={setTitle}
+            editable={isReading}
           />
           <TextInput placeholder='Write your reminder here'
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
@@ -288,6 +300,7 @@ export default function RemindersScreen() {
             multiline
             value={body}
             onChangeText={setBody}
+            editable={isReading}
           />
           <Pressable style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]} onPress={saveReminder}>
             <View style={{alignItems: 'center'}}>
@@ -315,5 +328,6 @@ const styles = StyleSheet.create({
   setReminderBox: {
     display: 'flex',
     flexDirection: 'row'
-  }
+  },
+  
 })

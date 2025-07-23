@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -13,6 +13,7 @@ export default function NoteScreen() {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [notes, setNotes] = useState([]);
+  const [isReading, setIsReading] = useState(false);
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -61,11 +62,22 @@ export default function NoteScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <SafeAreaView style={createPageStyles.inputFieldContainer}>
+        <View>
+          <TouchableOpacity 
+            style={[createPageStyles.viewMode, isReading && {backgroundColor: '#ffa400'}]} 
+            onPress={() => setIsReading((previous) => previous = !previous)}
+          >
+            <Text style={[{fontWeight: 600}, isReading && {color: 'white'}]}>
+              {isReading ? "Edit mode" : "Read mode"}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <TextInput
             placeholder="Enter title"
             value={title}
             onChangeText={setTitle}
             cursorColor='#ffa400'
+            editable={isReading}
             style={[createPageStyles.inputField, createPageStyles.titleInput]}
         />
         <TextInput
@@ -74,6 +86,7 @@ export default function NoteScreen() {
             onChangeText={setBody}
             cursorColor='#ffa400'
             multiline
+            editable={isReading}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
         />
         <Pressable
