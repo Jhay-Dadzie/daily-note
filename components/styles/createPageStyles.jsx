@@ -35,6 +35,16 @@ const createPageStyles = StyleSheet.create({
         marginBottom: 40,
         bottom: 70,
         right: 40
+    },
+    viewMode: {
+        borderRadius: 8,
+        borderWidth: 2,
+        borderColor: '#ffa400',
+        padding: 8,
+        width: '25%',
+        alignItems: 'center',
+        alignSelf: 'center',
+        marginVertical: 10,
     }
 })
 

@@ -46,6 +46,7 @@ export const PushNotification = {
           data: { id: reminder.id },
           android: {
             channelId: 'reminders',
+            sound: 'notificationSound'
           }
         },
         trigger: triggerDate
