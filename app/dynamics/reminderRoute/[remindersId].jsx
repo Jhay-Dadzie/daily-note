@@ -292,7 +292,7 @@ export default function RemindersScreen() {
           <Pressable style={createPageStyles.saveButton} onPress={saveReminder}>
             <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
               <FontAwesome name='save' size={25} color={'white'}/>
-              <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Update</Text>
+              <Text style={{color: 'white', fontWeight: 'bold'}}>Update</Text>
             </View>
           </Pressable>
         </SafeAreaView>
