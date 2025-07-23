@@ -1,13 +1,21 @@
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    
-    shouldShowList: true,
+    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
 });
+
+if (Platform.OS === 'android') {
+  Notifications.setNotificationChannelAsync('reminders', {
+    name: 'Reminders',
+    importance: Notifications.AndroidImportance.MAX,
+    sound: 'notificationSound.mp3',
+  });
+}
 
 export const PushNotification = {
   async requestPermissions() {
@@ -21,16 +29,26 @@ export const PushNotification = {
 
   async schedule(reminder) {
     try {
+      const triggerDate = new Date(reminder.schedule);
+      triggerDate.setSeconds(0);
+      triggerDate.setMilliseconds(0);
+
+      if (triggerDate.getTime() <= Date.now()) {
+        console.warn('Cannot schedule notification in the past');
+        return null;
+      }
+
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
-          title: reminder.title || 'Reminder',
+          title: reminder.title == "No title" ? "Reminder" : reminder.title,
           body: reminder.body,
-          sound: 'default',
+          sound: 'notificationSound.mp3',
           data: { id: reminder.id },
+          android: {
+            channelId: 'reminders',
+          }
         },
-        trigger: {
-          date: new Date(reminder.schedule),
-        },
+        trigger: triggerDate
       });
       return notificationId;
     } catch (error) {
