@@ -37,6 +37,7 @@ export default function createReminder(){
     finalDate.setHours(selectedTime.getHours());
     finalDate.setMinutes(selectedTime.getMinutes());
     finalDate.setSeconds(0);
+    finalDate.setMilliseconds(0)
 
     const now = new Date();
     const isToday = finalDate.toDateString() === now.toDateString();
@@ -48,7 +49,6 @@ export default function createReminder(){
     }
     
     setSelectedDate(finalDate);
-
     setAlarm(finalDate);
     setShowReminderOptions(false);
     setShowMode('date');
@@ -57,20 +57,31 @@ export default function createReminder(){
   const addReminder = async () => {
     if(body.trim()) {
       try {
+
+        if (!alarm || alarm.getTime() <= new Date().getTime()) {
+          Alert.alert("Empty Reminder Time", "Please set a future time for your reminder");
+          return;
+        }
+
         const savedReminders = await AsyncStorage.getItem('reminders')
         const existingReminders = savedReminders ? JSON.parse(savedReminders) : []
         const newReminder = {
           id: Date.now(),
           title: title || "No title",
           body,
-          schedule: alarm,
+          schedule: alarm.getTime(),
           notificationId: null
         }
 
         const notificationId = await PushNotification.schedule({
           ...newReminder,
-          schedule: new Date(alarm)
+          schedule: alarm
         });
+
+        if (!notificationId) {
+          Alert.alert("Error", "Failed to schedule notification");
+          return;
+        }
       
         newReminder.notificationId = notificationId;
 
@@ -79,6 +90,8 @@ export default function createReminder(){
         setReminders(updatedReminders)
 
         router.replace({pathname: '/(tabs)/reminder', params: {refresh: Date.now()}})
+        console.log('Scheduling notification for:', alarm);
+        console.log('Current time is:', new Date());
       } catch(error) {
         console.error("Error", error)
       }
@@ -119,7 +132,7 @@ export default function createReminder(){
             style={{
               position: 'absolute',
               top: 0, bottom: 0, left: 0, right: 0,
-              backgroundColor: 'rgba(0,0,0,0.7)',
+              backgroundColor: 'rgba(0,0,0,0.8)',
               justifyContent: 'center',
               alignItems: 'center',
               zIndex: 10

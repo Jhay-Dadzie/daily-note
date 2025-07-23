@@ -105,7 +105,7 @@ export default function Reminder() {
         contentContainerStyle={reminders.length === 0 ? styles.emptyListContainer : null}
         renderItem={renderItem}
         keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
-        layoutAnimation={LinearTransition}
+        itemLayoutAnimation={LinearTransition}
         ItemSeparatorComponent={() => <View style={{height: 5}} />}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
