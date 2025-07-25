@@ -47,6 +47,7 @@ export default function createToDo() {
         >
             <SafeAreaView style={createPageStyles.inputFieldContainer}>
                 <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
+                    placeholderTextColor={'#656768'}
                     autoFocus
                     cursorColor={'#ffa400'}
                     value={title}
@@ -58,6 +59,7 @@ export default function createToDo() {
                     multiline
                     value={body}
                     onChangeText={setBody}
+                    placeholderTextColor={'#717272'}
                 />
                 <Pressable style={createPageStyles.saveButton} onPress={addTodo}>
                     <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>

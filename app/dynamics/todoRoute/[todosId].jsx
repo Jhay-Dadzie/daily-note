@@ -14,7 +14,7 @@ export default function TodoScreen() {
     const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
     const [todos, setTodos] = useState([])
-    const [isReading, setIsReading] = useState(false)
+    const [isEditable, setIsEditable] = useState(false)
 
     useEffect(() => {
         const loadTodos = async () => {
@@ -68,35 +68,38 @@ export default function TodoScreen() {
         <SafeAreaView style={createPageStyles.inputFieldContainer}>
             <View>
                 <TouchableOpacity 
-                style={[createPageStyles.viewMode, isReading && {backgroundColor: '#ffa400'}]} 
-                onPress={() => setIsReading((previous) => previous = !previous)}
+                style={[createPageStyles.viewMode, isEditable && {backgroundColor: '#ffa400'}]} 
+                onPress={() => setIsEditable((previous) => previous = !previous)}
                 >
-                <Text style={[{fontWeight: 600}, isReading && {color: 'white'}]}>
-                    {isReading ? "Edit mode" : "Read mode"}
+                <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}]}>
+                    {isEditable ? "Edit mode" : "Read mode"}
                 </Text>
                 </TouchableOpacity>
             </View>
 
             <TextInput
                 placeholder="Enter title"
+                placeholderTextColor={'#656768'}
                 value={title}
                 onChangeText={setTitle}
                 cursorColor='#ffa400'
-                editable={isReading} 
+                editable={isEditable} 
                 style={[createPageStyles.inputField, createPageStyles.titleInput]}
             />
             <TextInput
                 placeholder="Write your note here"
+                placeholderTextColor={'#717272'}
                 value={body}
                 onChangeText={setBody}
                 cursorColor='#ffa400'
                 multiline
-                editable={isReading}
+                editable={isEditable}
                 style={[createPageStyles.inputField, createPageStyles.bodyInput]}
             />
             <Pressable
                 onPress={saveTodo}
-                style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15} ]}
+                style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15},!isEditable && {opacity: 0}]}
+                disabled={!isEditable}
             >
                 <View style={{ alignItems: 'center' }}>
                     <FontAwesome name='save' size={22} color="white" />

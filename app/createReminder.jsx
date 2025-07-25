@@ -252,8 +252,10 @@ export default function createReminder(){
             cursorColor={'#ffa400'}
             value={title}
             onChangeText={setTitle}
+            placeholderTextColor={'#656768'}
           />
           <TextInput placeholder='Write your reminder here'
+            placeholderTextColor={'#717272'}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
             cursorColor={'#ffa400'}
             multiline

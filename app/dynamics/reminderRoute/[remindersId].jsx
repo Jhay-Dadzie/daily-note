@@ -14,7 +14,7 @@ import { PushNotification } from '@/components/pushNotification'
 export default function RemindersScreen() {
   const { remindersId } = useLocalSearchParams()
   const isEditing = remindersId !== 'new';
-  const [isReading, setIsReading] = useState(false)
+  const [isEditable, setIsEditable] = useState(false)
 
   let today = new Date();
   let timeToRemind = new Date(today.getTime() + 60 * 1000)
@@ -144,11 +144,11 @@ export default function RemindersScreen() {
       >
         <View>
           <TouchableOpacity 
-            style={[createPageStyles.viewMode, isReading && {backgroundColor: '#ffa400'}]} 
-            onPress={() => setIsReading((previous) => previous = !previous)}
+            style={[createPageStyles.viewMode, isEditable && {backgroundColor: '#ffa400'}]} 
+            onPress={() => setIsEditable((previous) => previous = !previous)}
           >
-            <Text style={[{fontWeight: 600}, isReading && {color: 'white'}]}>
-              {isReading ? "Edit mode" : "Read mode"}
+            <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}]}>
+              {isEditable ? "Edit mode" : "Read mode"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -289,20 +289,25 @@ export default function RemindersScreen() {
 
         <SafeAreaView style={createPageStyles.inputFieldContainer}>
           <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
+            placeholderTextColor={'#656768'}
             cursorColor={'#ffa400'}
             value={title}
             onChangeText={setTitle}
-            editable={isReading}
+            editable={isEditable}
           />
           <TextInput placeholder='Write your reminder here'
+            placeholderTextColor={'#717272'}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
             cursorColor={'#ffa400'}
             multiline
             value={body}
             onChangeText={setBody}
-            editable={isReading}
+            editable={isEditable}
           />
-          <Pressable style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]} onPress={saveReminder}>
+          <Pressable style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}, !isEditable && {opacity: 0}]} 
+            onPress={saveReminder}
+            disabled={!isEditable}
+          >
             <View style={{alignItems: 'center'}}>
               <FontAwesome name='save' size={25} color={'white'}/>
               <Text style={{color: 'white', fontWeight: 'bold'}}>Update</Text>

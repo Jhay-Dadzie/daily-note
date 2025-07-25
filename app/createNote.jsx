@@ -48,12 +48,14 @@ export default function createNote() {
         >
             <SafeAreaView style={createPageStyles.inputFieldContainer}>
                 <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
+                    placeholderTextColor={'#656768'}
                     autoFocus
                     cursorColor={'#ffa400'}
                     value={title}
                     onChangeText={setTitle}
                 />
                 <TextInput placeholder='Write your note here'
+                    placeholderTextColor={'#717272'}
                     style={[createPageStyles.inputField, createPageStyles.bodyInput]}
                     cursorColor={'#ffa400'}
                     multiline
