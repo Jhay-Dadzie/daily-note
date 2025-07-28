@@ -7,6 +7,7 @@ import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
 import { StatusBar } from 'expo-status-bar';
 import styles from "@/components/styles/styles";
+import { themeColor } from "@/components/constants/themeColor";
 
 export default function Index() {
   const { refresh } = useLocalSearchParams()
@@ -62,7 +63,7 @@ export default function Index() {
           }}
           onPress={() => deleteNote(item.id)}
         >
-          <FontAwesome name="trash" size={22} color={'#ffa400'}/>
+          <FontAwesome name="trash" size={22} color={themeColor.colorTheme.color}/>
         </Pressable>
       </View>
     )

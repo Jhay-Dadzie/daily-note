@@ -5,6 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
+import { themeColor } from '@/components/constants/themeColor';
 
 export default function TodoScreen() {
     const { todosId, title: initialTitle, body: initialBody } = useLocalSearchParams()
@@ -68,7 +69,7 @@ export default function TodoScreen() {
         <SafeAreaView style={createPageStyles.inputFieldContainer}>
             <View>
                 <TouchableOpacity 
-                style={[createPageStyles.viewMode, isEditable && {backgroundColor: '#ffa400'}]} 
+                style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
                 onPress={() => setIsEditable((previous) => previous = !previous)}
                 >
                 <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}]}>
@@ -82,7 +83,7 @@ export default function TodoScreen() {
                 placeholderTextColor={'#656768'}
                 value={title}
                 onChangeText={setTitle}
-                cursorColor='#ffa400'
+                cursorColor={themeColor.colorTheme.color}
                 editable={isEditable} 
                 style={[createPageStyles.inputField, createPageStyles.titleInput]}
             />
@@ -91,7 +92,7 @@ export default function TodoScreen() {
                 placeholderTextColor={'#717272'}
                 value={body}
                 onChangeText={setBody}
-                cursorColor='#ffa400'
+                cursorColor={themeColor.colorTheme.color}
                 multiline
                 editable={isEditable}
                 style={[createPageStyles.inputField, createPageStyles.bodyInput]}

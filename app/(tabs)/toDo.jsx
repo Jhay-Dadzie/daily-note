@@ -7,7 +7,8 @@ import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
 import { StatusBar } from 'expo-status-bar';
 import styles from "@/components/styles/styles";
-import CheckBox from 'expo-checkbox'
+import CheckBox from 'expo-checkbox';
+import { themeColor } from "@/components/constants/themeColor";
 
 export default function ToDo() {
   const { refresh } = useLocalSearchParams()
@@ -62,7 +63,7 @@ export default function ToDo() {
                     setTodos(updatedTodos);
                     AsyncStorage.setItem('todos', JSON.stringify(updatedTodos));
                   }}
-                  color={item.isChecked ? '#ffa400' : undefined}
+                  color={item.isChecked ? themeColor.colorTheme.color : undefined}
                 />
                 <Text style={[styles.title, item.isChecked && {textDecorationLine: 'line-through'}]}>
                   {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
@@ -88,7 +89,7 @@ export default function ToDo() {
           }}
           onPress={() => deleteTodo(item.id)}
         >
-          <FontAwesome name="trash" size={22} color={'#ffa400'}/>
+          <FontAwesome name="trash" size={22} color={themeColor.colorTheme.color}/>
         </Pressable>
       </View>
     )

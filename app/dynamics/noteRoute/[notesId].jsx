@@ -5,6 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
+import { themeColor } from '@/components/constants/themeColor';
 
 export default function NoteScreen() {
   const { notesId } = useLocalSearchParams();
@@ -64,10 +65,10 @@ export default function NoteScreen() {
       <SafeAreaView style={createPageStyles.inputFieldContainer}>
         <View>
           <TouchableOpacity 
-            style={[createPageStyles.viewMode, isEditable && {backgroundColor: '#ffa400'}]} 
+            style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
             onPress={() => setIsEditable((previous) => previous = !previous)}
           >
-            <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}, !isEditable && {opacity: 0}]}>
+            <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}]}>
               {isEditable ? "Edit mode" : "Read mode"}
             </Text>
           </TouchableOpacity>
@@ -77,7 +78,7 @@ export default function NoteScreen() {
             placeholderTextColor={'#656768'}
             value={title}
             onChangeText={setTitle}
-            cursorColor='#ffa400'
+            cursorColor={themeColor.colorTheme.color}
             editable={isEditable}
             style={[createPageStyles.inputField, createPageStyles.titleInput]}
         />
@@ -86,7 +87,7 @@ export default function NoteScreen() {
             placeholderTextColor={'#717272'}
             value={body}
             onChangeText={setBody}
-            cursorColor='#ffa400'
+            cursorColor={themeColor.colorTheme.color}
             multiline
             editable={isEditable}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}

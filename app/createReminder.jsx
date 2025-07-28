@@ -11,6 +11,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { PushNotification } from '@/components/pushNotification'
+import { themeColor } from '@/components/constants/themeColor';
 
 export default function createReminder(){
 
@@ -155,7 +156,7 @@ export default function createReminder(){
                     minDate={today}
                     styles={{
                       ...defaultStyles,
-                      today: {backgroundColor: '#ffa400'},
+                      today: {backgroundColor: themeColor.colorTheme.color},
                       selected: {backgroundColor: '#f3e1c0ff'},
                     }}
                   />
@@ -164,7 +165,7 @@ export default function createReminder(){
                       onPress={() => setShowMode('time')}
                       style={{
                         marginTop: 15,
-                        backgroundColor: '#ffa400',
+                        backgroundColor: themeColor.colorTheme.color,
                         padding: 12,
                         borderRadius: 10,
                         alignItems: 'center'
@@ -178,13 +179,13 @@ export default function createReminder(){
                         marginTop: 15,
                         backgroundColor: 'white',
                         borderWidth: 1,
-                        borderColor: '#ffa400',
+                        borderColor: themeColor.colorTheme.color,
                         padding: 12,
                         borderRadius: 10,
                         alignItems: 'center'
                       }}
                     >
-                      <Text style={{color: '#ffa400', fontWeight: 'bold'}}>Cancel</Text>
+                      <Text style={{color: themeColor.colorTheme.color, fontWeight: 'bold'}}>Cancel</Text>
                     </Pressable>
                   </View>
                 </>
@@ -217,7 +218,7 @@ export default function createReminder(){
                       onPress={selectDateTimeReminder}
                       style={{
                         marginTop: 15,
-                        backgroundColor: '#ffa400',
+                        backgroundColor: themeColor.colorTheme.color,
                         padding: 12,
                         borderRadius: 10,
                         alignItems: 'center'
@@ -231,13 +232,13 @@ export default function createReminder(){
                         marginTop: 15,
                         backgroundColor: 'white',
                         borderWidth: 1,
-                        borderColor: '#ffa400',
+                        borderColor: themeColor.colorTheme.color,
                         padding: 12,
                         borderRadius: 10,
                         alignItems: 'center'
                       }}
                     >
-                      <Text style={{color: '#ffa400', fontWeight: 'bold'}}>Back to Date</Text>
+                      <Text style={{color: themeColor.colorTheme.color, fontWeight: 'bold'}}>Back to Date</Text>
                     </Pressable>
                   </View>
                 </>
@@ -249,7 +250,7 @@ export default function createReminder(){
 
         <SafeAreaView style={createPageStyles.inputFieldContainer}>
           <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
-            cursorColor={'#ffa400'}
+            cursorColor={themeColor.colorTheme.color}
             value={title}
             onChangeText={setTitle}
             placeholderTextColor={'#656768'}
@@ -257,7 +258,7 @@ export default function createReminder(){
           <TextInput placeholder='Write your reminder here'
             placeholderTextColor={'#717272'}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-            cursorColor={'#ffa400'}
+            cursorColor={themeColor.colorTheme.color}
             multiline
             value={body}
             onChangeText={setBody}

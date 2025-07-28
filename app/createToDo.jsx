@@ -7,6 +7,7 @@ import { Todos } from '@/components/toDo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
+import { themeColor } from '@/components/constants/themeColor';
 
 export default function createToDo() {
     const [title, setTitle] = useState("")
@@ -49,13 +50,13 @@ export default function createToDo() {
                 <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
                     placeholderTextColor={'#656768'}
                     autoFocus
-                    cursorColor={'#ffa400'}
+                    cursorColor={themeColor.colorTheme.color}
                     value={title}
                     onChangeText={setTitle}
                 />
                 <TextInput placeholder='Write your note here'
                     style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-                    cursorColor={'#ffa400'}
+                    cursorColor={themeColor.colorTheme.color}
                     multiline
                     value={body}
                     onChangeText={setBody}

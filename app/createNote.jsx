@@ -7,6 +7,7 @@ import { Notes } from '@/components/note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import createPageStyles from '@/components/styles/createPageStyles';
+import { themeColor } from '@/components/constants/themeColor';
 
 export default function createNote() {
     
@@ -50,14 +51,14 @@ export default function createNote() {
                 <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
                     placeholderTextColor={'#656768'}
                     autoFocus
-                    cursorColor={'#ffa400'}
+                    cursorColor={themeColor.colorTheme.color}
                     value={title}
                     onChangeText={setTitle}
                 />
                 <TextInput placeholder='Write your note here'
                     placeholderTextColor={'#717272'}
                     style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-                    cursorColor={'#ffa400'}
+                    cursorColor={themeColor.colorTheme.color}
                     multiline
                     value={body}
                     onChangeText={setBody}
