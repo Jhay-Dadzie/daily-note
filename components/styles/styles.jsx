@@ -1,5 +1,5 @@
 import {StyleSheet, Platform } from 'react-native'
-
+import { themeColor } from '../constants/themeColor';
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 2,
     borderRadius: 10,
-    borderColor: '#ffa400',
+    borderColor: themeColor.colorTheme.color,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   createNoteButton: {
     flexDirection: 'row',
-    backgroundColor: '#ffa400',
+    backgroundColor: themeColor.colorTheme.color,
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 25,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   addNoteButton: {
-    backgroundColor: '#ffa400',
+    backgroundColor: themeColor.colorTheme.color,
     width: 70,
     paddingVertical: 10,
     paddingHorizontal: 5,

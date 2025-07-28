@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-
+import { themeColor } from "../constants/themeColor";
 const createPageStyles = StyleSheet.create({
     container: {
         flex: 1,
@@ -25,7 +25,7 @@ const createPageStyles = StyleSheet.create({
         textAlignVertical: 'top'
     },
     saveButton: {
-        backgroundColor: '#ffa400',
+        backgroundColor: themeColor.colorTheme.color,
         paddingVertical: 10,
         paddingHorizontal: 18,
         justifyContent: 'center',
@@ -39,7 +39,7 @@ const createPageStyles = StyleSheet.create({
     viewMode: {
         borderRadius: 8,
         borderWidth: 2,
-        borderColor: '#ffa400',
+        borderColor: themeColor.colorTheme.color,
         padding: 8,
         width: '25%',
         alignItems: 'center',
