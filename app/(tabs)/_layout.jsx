@@ -1,14 +1,33 @@
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { themeColor } from "@/components/constants/themeColor";
-
+import { ThemeProvider, ThemeContext } from "@/context/ThemeContext";
+import { useState, useContext } from "react";
+import { Appearance, View, Text } from "react-native";
+import { MenuProvider, Menu, MenuTrigger, MenuOptions, MenuOption} from "react-native-popup-menu"
 export default function TabLayout() {
+    const {colorScheme, setColorScheme, theme} = useContext(ThemeContext)
     return(
+        <MenuProvider>
             <Tabs screenOptions={{
                 fontWeight: 'bold',
                 tabBarActiveTintColor: themeColor.colorTheme.color,
-                tabBarInactiveTintColor: '#656768',
+                tabBarInactiveTintColor: themeColor.lightMode.icon,
                 headerBackVisible: false,
+                headerRight: () => (
+                    <Menu>
+                        <MenuTrigger style={{padding: 3}}>
+                            <View>
+                                <FontAwesome name="bars" size={20} style={{marginRight: 15}}/>
+                            </View>
+                        </MenuTrigger>
+                        <MenuOptions style={{padding: 10}}>
+                            <MenuOption onSelect={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}>
+                                <Text>Change to {colorScheme === 'light' ? "dark" : "light"} mode</Text>
+                            </MenuOption>
+                        </MenuOptions>
+                    </Menu>
+                )
             }}>
                 <Tabs.Screen name="index" options={{
                     title: 'Daily Notes',
@@ -38,5 +57,7 @@ export default function TabLayout() {
                     }
                 }}/>
             </Tabs>
+
+        </MenuProvider>
     )
 }
