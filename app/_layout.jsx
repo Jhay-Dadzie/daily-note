@@ -1,7 +1,12 @@
 import { Stack } from "expo-router";
+import { View } from "react-native"
+import { ThemeProvider } from "@/context/ThemeContext";
+import FontAwesome from "@expo/vector-icons/FontAwesome"
 export default function RootLayout() {
   return (
-      <Stack>
+    <ThemeProvider>
+
+      <Stack screenOptions={{presentation: 'modal'}}>
         <Stack.Screen name="(tabs)" options={{
           headerShown: false,
           presentation: 'modal'
@@ -27,5 +32,6 @@ export default function RootLayout() {
         }}/>
   
       </Stack>
+    </ThemeProvider>
   )
 }
