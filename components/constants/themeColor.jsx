@@ -3,13 +3,15 @@ export const themeColor = {
         background: 'white',
         emptyTitle: 'black',
         title: '#656768',
-        body: '#717272'
+        body: '#717272',
+        icon: '656768',
     },
     darkMode: {
         background: '#151515',
         emptyTitle: 'black',
         title: '#f2f2f2',
-        body: '#ffffff'
+        body: '#ffffff',
+        icon: '#f2f2f2',
     },
 
     colorTheme: {
