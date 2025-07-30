@@ -1,8 +1,8 @@
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { themeColor } from "@/components/constants/themeColor";
-import { ThemeProvider, ThemeContext } from "@/context/ThemeContext";
-import { useState, useContext } from "react";
+import { ThemeContext } from "@/context/ThemeContext";
+import { useContext } from "react";
 import { Appearance, View, Text } from "react-native";
 import { MenuProvider, Menu, MenuTrigger, MenuOptions, MenuOption} from "react-native-popup-menu"
 export default function TabLayout() {

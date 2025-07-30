@@ -177,7 +177,7 @@ export default function RemindersScreen() {
             style={{
               position: 'absolute',
               top: 0, bottom: 0, left: 0, right: 0,
-              backgroundColor: 'rgba(0,0,0,0.8)',
+              backgroundColor:  'rgba(0, 0, 0, 0.8)',
               justifyContent: 'center',
               alignItems: 'center',
               zIndex: 10
@@ -189,6 +189,7 @@ export default function RemindersScreen() {
                 borderRadius: 20,
                 padding: 20,
                 width: '90%',
+                backgroundColor: colorScheme === 'dark' ? "#0c0f01" : null
               }}
             >
               {showMode === 'date' ? (
@@ -201,7 +202,16 @@ export default function RemindersScreen() {
                     styles={{
                       ...defaultStyles,
                       today: {backgroundColor: themeColor.colorTheme.color},
-                      selected: {backgroundColor: '#f3e1c0ff'},
+                      selected: {backgroundColor: '#f3e1c0'},
+                      month: {
+                        color: colorScheme === 'light' ? "black" : "white"
+                      },
+                      day: {
+                        color: colorScheme === 'light' ? "black" : "white"
+                      },
+                      weekday_label: {
+                        color: themeColor.colorTheme.color
+                      }
                     }}
                   />
                   <View>
@@ -241,6 +251,7 @@ export default function RemindersScreen() {
                     display='spinner'
                     minimumDate={isTodaySelected ? today : undefined}
                     minimumTime={minimumTime}
+                    is24Hour={false}
                     onChange={(event, date) => {
                       if (event.type === 'dismissed') {
                         setShowMode('date');

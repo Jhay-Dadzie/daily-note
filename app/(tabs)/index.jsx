@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Alert } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Alert, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
@@ -46,7 +46,7 @@ export default function Index() {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/noteRoute/${item.id}`} asChild>
-          <Pressable style={{flex: 1}}>
+          <TouchableOpacity style={{flex: 1}}>
             <View>
               <Text style={styles.title}>
                 {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
@@ -55,7 +55,7 @@ export default function Index() {
                 {item.body.length > 200 ? item.body.slice(0, 200) + '.....' : item.body}
               </Text>
             </View>
-          </Pressable>
+          </TouchableOpacity>
         </Link>
 
         <Pressable style={{

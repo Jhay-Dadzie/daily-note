@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect } from "react";
@@ -48,7 +48,7 @@ export default function ToDo() {
     return (
       <View style={[styles.noteView, item.isChecked && {opacity: 0.5}]}>
         <Link href={`dynamics/todoRoute/${item.id}`} asChild>
-          <Pressable style={{flex: 1}}>
+          <TouchableOpacity style={{flex: 1}}>
             <View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox
@@ -81,7 +81,7 @@ export default function ToDo() {
                 )
               }
             </View>
-          </Pressable>
+          </TouchableOpacity>
         </Link>
 
         <Pressable style={{

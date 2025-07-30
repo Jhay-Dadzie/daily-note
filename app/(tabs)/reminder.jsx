@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert, TouchableHighlight } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
 import { useState, useEffect, useContext } from "react";
@@ -71,7 +71,7 @@ export default function Reminder() {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
-          <TouchableHighlight underlayColor={"#faf2e2"} style={{flex: 1}}>
+          <TouchableOpacity underlayColor={"#faf2e2"} style={{flex: 1}}>
             <View style={styles.noteViewContainer}>
               <Text style={styles.title}>
                 {item.title.length > 50 ? item.title.slice(0, 50) + '....' : item.title}
@@ -87,7 +87,7 @@ export default function Reminder() {
                 </Text>
               </View>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </Link>
 
         <Pressable style={{
