@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, Alert, TouchableOpacity } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { SlideInDown } from 'react-native-reanimated';
@@ -310,15 +310,25 @@ export default function RemindersScreen() {
             onChangeText={setTitle}
             editable={isEditable}
           />
-          <TextInput placeholder='Write your reminder here'
-            placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
-            style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-            cursorColor={themeColor.colorTheme.color}
-            multiline
-            value={body}
-            onChangeText={setBody}
-            editable={isEditable}
-          />
+          {isEditable ? (
+            <ScrollView>
+              <TextInput placeholder='Write your reminder here'
+                placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
+                style={[createPageStyles.inputField, createPageStyles.bodyInput]}
+                cursorColor={themeColor.colorTheme.color}
+                multiline
+                value={body}
+                onChangeText={setBody}
+              />
+            </ScrollView>
+          ): (
+            <ScrollView style={[createPageStyles.inputField, createPageStyles.bodyInput]}>
+              <Text style={{ color: colorScheme === "light" ? '#333' : '#fff', fontSize: 16 }}>
+                {body}
+              </Text>
+            </ScrollView>
+          )}
+          
           <Pressable style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}, !isEditable && {opacity: 0}]} 
             onPress={saveReminder}
             disabled={!isEditable}

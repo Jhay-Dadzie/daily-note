@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
+import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, TouchableOpacity, ScrollView } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -91,16 +91,25 @@ export default function TodoScreen() {
                 editable={isEditable} 
                 style={[createPageStyles.inputField, createPageStyles.titleInput]}
             />
-            <TextInput
-                placeholder="Write your note here"
-                placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
-                value={body}
-                onChangeText={setBody}
-                cursorColor={themeColor.colorTheme.color}
-                multiline
-                editable={isEditable}
-                style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-            />
+            {isEditable ? (
+                <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                    <TextInput
+                        placeholder="Write your note here"
+                        placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
+                        value={body}
+                        onChangeText={setBody}
+                        cursorColor={themeColor.colorTheme.color}
+                        multiline
+                        style={[createPageStyles.inputField, createPageStyles.bodyInput]}
+                    />
+                </ScrollView>
+            ) : (
+                <ScrollView style={[createPageStyles.inputField, createPageStyles.bodyInput]}>
+                    <Text style={{ color: colorScheme === "light" ? '#333' : '#fff', fontSize: 16 }}>
+                        {body}
+                    </Text>
+                </ScrollView>
+            )}
             <Pressable
                 onPress={saveTodo}
                 style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15},!isEditable && {opacity: 0}]}
