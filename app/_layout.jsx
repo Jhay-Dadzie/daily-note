@@ -1,9 +1,11 @@
 import { Stack } from "expo-router";
 import { View } from "react-native"
+import { StatusBar } from "expo-status-bar";
 import { ThemeProvider } from "@/context/ThemeContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useContext } from 'react';
 import { ThemeContext } from '@/context/ThemeContext';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function InnerLayout() {
   const { theme, colorScheme } = useContext(ThemeContext);
@@ -16,6 +18,7 @@ function InnerLayout() {
           backgroundColor: colorScheme === 'light' ? 'white' : '#000000' ,
         },
         headerTintColor: theme.title,
+        statusBarStyle: colorScheme === 'light' ? 'dark' : 'light'
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

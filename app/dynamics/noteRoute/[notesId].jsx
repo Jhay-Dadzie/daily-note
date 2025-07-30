@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { View, Pressable, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, TouchableOpacity, ScrollView } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StatusBar } from 'expo-status-bar';
 import { themeColor } from '@/components/constants/themeColor';
 import { useContext } from 'react';
 import { ThemeContext } from '@/context/ThemeContext';
@@ -117,7 +116,6 @@ export default function NoteScreen() {
                 </Text>
             </View>
         </Pressable>
-        <StatusBar style='dark' />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

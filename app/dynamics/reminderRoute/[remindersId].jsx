@@ -4,7 +4,6 @@ import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, K
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { SlideInDown } from 'react-native-reanimated';
-import { StatusBar } from 'expo-status-bar';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -339,7 +338,6 @@ export default function RemindersScreen() {
             </View>
           </Pressable>
         </SafeAreaView>
-        <StatusBar style='dark'/>
       </Animated.View>
     </KeyboardAvoidingView>
   );
