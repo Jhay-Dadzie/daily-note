@@ -12,13 +12,18 @@ import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { PushNotification } from '@/components/pushNotification'
 import { themeColor } from '@/components/constants/themeColor';
+import { useContext } from 'react';
+import { ThemeContext } from '@/context/ThemeContext';
+import createPageStyleSheet from '@/components/styles/createPageStyles';
 
 export default function createReminder(){
 
   let today = new Date();
   let timeToRemind = new Date(today.getTime() + 60 * 1000)
   const defaultStyles = useDefaultStyles();
-  
+  const {colorScheme, theme} = useContext(ThemeContext)
+  const createPageStyles = createPageStyleSheet()
+  const styles = reminderStyles(colorScheme, theme)
 
   const [title, setTitle] = useState("")
   const [body, setBody] = useState("")
@@ -117,8 +122,14 @@ export default function createReminder(){
         }}
           >
           <View style={styles.setReminderBox}>
-            <Ionicons name="alarm" size={16}/>
-            <Text style={{marginLeft: 10, fontWeight: "600"}}>
+            <Ionicons name="alarm" size={16} color={colorScheme === "light" ? '#000000' : '#ffffff'}/>
+            <Text style={{
+              marginLeft: 10,
+              fontWeight: "600",
+              color: colorScheme === "light" ? '#000000' : '#ffffff'
+            }}
+            
+            >
               {
                 alarm ? alarm.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'}) :
                 "Set Reminder"
@@ -253,10 +264,10 @@ export default function createReminder(){
             cursorColor={themeColor.colorTheme.color}
             value={title}
             onChangeText={setTitle}
-            placeholderTextColor={'#656768'}
+            placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
           />
           <TextInput placeholder='Write your reminder here'
-            placeholderTextColor={'#717272'}
+            placeholderTextColor={colorScheme === "light" ? '#717272' : '#fffff'}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
             cursorColor={themeColor.colorTheme.color}
             multiline
@@ -277,18 +288,22 @@ export default function createReminder(){
   )
 }
 
-const styles = StyleSheet.create({
-  setReminderContainer: {
-    borderRadius: 10,
-    
-    padding: 10,
-    display: 'flex',
-    justifyContent: 'center',
-    alignSelf: 'center'
-    
-  },
-  setReminderBox: {
-    display: 'flex',
-    flexDirection: 'row'
-  }
-})
+function reminderStyles(colorScheme, theme) {
+  return StyleSheet.create({
+    setReminderContainer: {
+      borderRadius: 10,
+      backgroundColor: colorScheme === 'light' ? "#f2f2f2" : themeColor.colorTheme.color,
+      padding: 10,
+      display: 'flex',
+      justifyContent: 'center',
+      alignSelf: 'center',
+      marginTop: 15
+      
+    },
+    setReminderBox: {
+      display: 'flex',
+      flexDirection: 'row',
+
+    }
+  })
+}

@@ -5,17 +5,21 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { SlideInDown } from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
-import createPageStyles from '@/components/styles/createPageStyles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { PushNotification } from '@/components/pushNotification'
 import { themeColor } from '@/components/constants/themeColor';
+import { useContext } from 'react';
+import { ThemeContext } from '@/context/ThemeContext';
+import createPageStyleSheet from '@/components/styles/createPageStyles';
 
 export default function RemindersScreen() {
   const { remindersId } = useLocalSearchParams()
   const isEditing = remindersId !== 'new';
   const [isEditable, setIsEditable] = useState(false)
+  const createPageStyles = createPageStyleSheet()
+  const {colorScheme, theme} = useContext(ThemeContext)
 
   let today = new Date();
   let timeToRemind = new Date(today.getTime() + 60 * 1000)
@@ -71,7 +75,6 @@ export default function RemindersScreen() {
       Alert.alert("Invalid Time", "Please select a future time for today's reminder");
       return;
     }
-    //const schedule = finalDate.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
     
     setSelectedDate(finalDate);
     setAlarm(finalDate);
@@ -148,7 +151,7 @@ export default function RemindersScreen() {
             style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
             onPress={() => setIsEditable((previous) => previous = !previous)}
           >
-            <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}]}>
+            <Text style={[{fontWeight: 600, color: colorScheme === 'light' ? 'black' : themeColor.colorTheme.color}, isEditable && {color: 'white'}]}>
               {isEditable ? "Edit mode" : "Read mode"}
             </Text>
           </TouchableOpacity>
@@ -158,8 +161,8 @@ export default function RemindersScreen() {
           setShowMode('date')
         }}>
           <View style={styles.setReminderBox}>
-            <Ionicons name="alarm" size={16}/>
-            <Text style={{marginLeft: 10, fontWeight: "600"}}>
+            <Ionicons name="alarm" size={16} color={theme.icon}/>
+            <Text style={{marginLeft: 10, fontWeight: "600", color: theme.title}}>
               {
                 alarm ? alarm.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
                 : "Set Reminder"
@@ -290,14 +293,14 @@ export default function RemindersScreen() {
 
         <SafeAreaView style={createPageStyles.inputFieldContainer}>
           <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
-            placeholderTextColor={'#656768'}
+            placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
             cursorColor={themeColor.colorTheme.color}
             value={title}
             onChangeText={setTitle}
             editable={isEditable}
           />
           <TextInput placeholder='Write your reminder here'
-            placeholderTextColor={'#717272'}
+            placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
             style={[createPageStyles.inputField, createPageStyles.bodyInput]}
             cursorColor={themeColor.colorTheme.color}
             multiline

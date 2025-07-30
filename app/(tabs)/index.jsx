@@ -6,13 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
 import { StatusBar } from 'expo-status-bar';
-import styles from "@/components/styles/styles";
+import viewPageStyles from "@/components/styles/styles";
 import { themeColor } from "@/components/constants/themeColor";
 
 export default function Index() {
   const { refresh } = useLocalSearchParams()
   const [notes, setNotes] = useState([]);
-
+  const styles = viewPageStyles()
   const deleteNote = async (id) => {
     Alert.alert("Delete", "Are you sure you want to delete?",
       [

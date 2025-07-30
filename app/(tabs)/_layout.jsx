@@ -12,18 +12,27 @@ export default function TabLayout() {
             <Tabs screenOptions={{
                 fontWeight: 'bold',
                 tabBarActiveTintColor: themeColor.colorTheme.color,
-                tabBarInactiveTintColor: themeColor.lightMode.icon,
+                tabBarInactiveTintColor: theme.icon,
                 headerBackVisible: false,
+                tabBarStyle: {
+                    backgroundColor: theme.background
+                },
+                headerStyle: {
+                    backgroundColor: colorScheme === 'light' ? "white" : "black"
+                },
+                headerTintColor: theme.title,
                 headerRight: () => (
                     <Menu>
                         <MenuTrigger style={{padding: 3}}>
                             <View>
-                                <FontAwesome name="bars" size={20} style={{marginRight: 15}}/>
+                                <FontAwesome name="bars" size={20} color={colorScheme === 'light' ? "black" : "white"}
+                                    style={{marginRight: 15}}
+                                />
                             </View>
                         </MenuTrigger>
-                        <MenuOptions style={{padding: 10}}>
+                        <MenuOptions style={{padding: 10, backgroundColor: theme.background}}>
                             <MenuOption onSelect={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}>
-                                <Text>Change to {colorScheme === 'light' ? "dark" : "light"} mode</Text>
+                                <Text style={{color: theme.title}}>Change to {colorScheme === 'light' ? "dark" : "light"} mode</Text>
                             </MenuOption>
                         </MenuOptions>
                     </Menu>

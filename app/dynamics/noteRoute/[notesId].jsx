@@ -4,8 +4,10 @@ import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, K
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
-import createPageStyles from '@/components/styles/createPageStyles';
 import { themeColor } from '@/components/constants/themeColor';
+import { useContext } from 'react';
+import { ThemeContext } from '@/context/ThemeContext';
+import createPageStyleSheet from '@/components/styles/createPageStyles';
 
 export default function NoteScreen() {
   const { notesId } = useLocalSearchParams();
@@ -15,6 +17,8 @@ export default function NoteScreen() {
   const [body, setBody] = useState('');
   const [notes, setNotes] = useState([]);
   const [isEditable, setIsEditable] = useState(false);
+  const createPageStyles = createPageStyleSheet()
+  const {colorScheme, theme} = useContext(ThemeContext)
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -63,19 +67,19 @@ export default function NoteScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <SafeAreaView style={createPageStyles.inputFieldContainer}>
-        <View>
+        <View style={{backgroundColor: theme.background}}>
           <TouchableOpacity 
             style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
             onPress={() => setIsEditable((previous) => previous = !previous)}
           >
-            <Text style={[{fontWeight: 600}, isEditable && {color: 'white'}]}>
+            <Text style={[{fontWeight: 600, color: colorScheme === 'light' ? 'black' : themeColor.colorTheme.color}, isEditable && {color: 'white'}, ]}>
               {isEditable ? "Edit mode" : "Read mode"}
             </Text>
           </TouchableOpacity>
         </View>
         <TextInput
             placeholder="Enter title"
-            placeholderTextColor={'#656768'}
+            placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
             value={title}
             onChangeText={setTitle}
             cursorColor={themeColor.colorTheme.color}
@@ -84,7 +88,7 @@ export default function NoteScreen() {
         />
         <TextInput
             placeholder="Write your note here"
-            placeholderTextColor={'#717272'}
+            placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
             value={body}
             onChangeText={setBody}
             cursorColor={themeColor.colorTheme.color}

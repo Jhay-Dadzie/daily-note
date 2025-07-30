@@ -6,15 +6,17 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Notes } from '@/components/note';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
-import createPageStyles from '@/components/styles/createPageStyles';
+import createPageStyleSheet from '@/components/styles/createPageStyles';
 import { themeColor } from '@/components/constants/themeColor';
-
+import { useContext } from 'react';
+import { ThemeContext } from '@/context/ThemeContext';
 export default function createNote() {
     
     const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
     const [notes, setNotes] = useState(Notes.sort((a,b) => b.id - a.id)|| [])
-
+    const createPageStyles = createPageStyleSheet()
+    const {colorScheme, theme} = useContext(ThemeContext)
     const addNote = async () => {
         if (body.trim()) {
             try {
@@ -49,14 +51,14 @@ export default function createNote() {
         >
             <SafeAreaView style={createPageStyles.inputFieldContainer}>
                 <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
-                    placeholderTextColor={'#656768'}
+                    placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
                     autoFocus
                     cursorColor={themeColor.colorTheme.color}
                     value={title}
                     onChangeText={setTitle}
                 />
                 <TextInput placeholder='Write your note here'
-                    placeholderTextColor={'#717272'}
+                    placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
                     style={[createPageStyles.inputField, createPageStyles.bodyInput]}
                     cursorColor={themeColor.colorTheme.color}
                     multiline

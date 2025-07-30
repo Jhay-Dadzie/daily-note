@@ -1,19 +1,21 @@
 import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert, TouchableHighlight } from "react-native";
 import { Link, useRouter } from "expo-router"
 import FontAwesome from "@expo/vector-icons/FontAwesome"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from "expo-router";
 import Animated, { LinearTransition} from "react-native-reanimated";
 import { StatusBar } from 'expo-status-bar';
-import styles from "@/components/styles/styles";
+import viewPageStyles from "@/components/styles/styles";
 import {PushNotification} from '@/components/pushNotification'
 import { themeColor } from "@/components/constants/themeColor";
-
+import { ThemeContext } from "@/context/ThemeContext";
 export default function Reminder() {
   const { refresh } = useLocalSearchParams()
   const [reminders, setReminders] = useState([]);
-
+  const {colorScheme, theme} = useContext(ThemeContext)
+  const styles = viewPageStyles(colorScheme, theme)
+  const reminderStyles = reminderStyleSheet(colorScheme, theme)
   const deleteNote = async (id) => {
     Alert.alert("Delete", "Are you sure you want to delete?", 
       [
@@ -69,7 +71,7 @@ export default function Reminder() {
     return (
       <View style={styles.noteView}>
         <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
-          <TouchableHighlight underlayColor={"#faf2e2ff"} style={{flex: 1}}>
+          <TouchableHighlight underlayColor={"#faf2e2"} style={{flex: 1}}>
             <View style={styles.noteViewContainer}>
               <Text style={styles.title}>
                 {item.title.length > 50 ? item.title.slice(0, 50) + '....' : item.title}
@@ -151,15 +153,16 @@ export default function Reminder() {
   );
 }
 
-const reminderStyles = StyleSheet.create({
+function reminderStyleSheet(colorScheme, theme) {
+  return StyleSheet.create({
   scheduleContainer: {
-    backgroundColor: "#d8d8d6ff",
+    backgroundColor: colorScheme ==='light' ? "#d8d8d6" : "#cbc8c8",
     display: "flex",
     borderRadius: 9,
-    opacity: 0.5,
     padding: 8,
     marginTop: 15,
     width: "45%",
     alignItems: 'center'
   },
 })
+}
