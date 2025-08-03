@@ -70,7 +70,7 @@ export default function NoteScreen() {
         <View style={{backgroundColor: theme.background}}>
           <TouchableOpacity 
             style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
-            onPress={() => setIsEditable((previous) => previous = !previous)}
+            onPress={() => setIsEditable(previous => !previous)}
           >
             <Text style={[{fontWeight: 600, color: colorScheme === 'light' ? 'black' : themeColor.colorTheme.color}, isEditable && {color: 'white'}, ]}>
               {isEditable ? "Edit mode" : "Read mode"}
@@ -105,30 +105,34 @@ export default function NoteScreen() {
             </Text>
           </ScrollView>
         )}
-        <Pressable
+        
+        {isEditable && (
+          <Pressable
             onPress={saveNote}
-            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}, !isEditable && {opacity: 0}]}
-            disabled={!isEditable}
-        >
+            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]}
+          >
             <View style={{ alignItems: 'center' }}>
-                <FontAwesome name='save' size={22} color="white" />
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                    Update
-                </Text>
+              <FontAwesome name='save' size={22} color="white" />
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                {isEditing ? "Update" : "Save"}
+              </Text>
             </View>
-        </Pressable>
-        <Pressable
-            onPress={() => {Speech.speak(body)}}
-            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}, isEditable && {opacity: 0}]}
-            disabled={isEditable}
-        >
+          </Pressable>
+        )}
+        
+        {!isEditable && (
+          <Pressable
+            onPress={() => Speech.speak(body)}
+            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}]}
+          >
             <View style={{ alignItems: 'center' }}>
-                <FontAwesome name='microphone' size={22} color="white" />
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                    Read
-                </Text>
+              <FontAwesome name='microphone' size={22} color="white" />
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                Read
+              </Text>
             </View>
-        </Pressable>
+          </Pressable>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

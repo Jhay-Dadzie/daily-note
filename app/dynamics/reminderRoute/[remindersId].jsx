@@ -12,6 +12,7 @@ import { themeColor } from '@/components/constants/themeColor';
 import { useContext } from 'react';
 import { ThemeContext } from '@/context/ThemeContext';
 import createPageStyleSheet from '@/components/styles/createPageStyles';
+import * as Speech from 'expo-speech'
 
 export default function RemindersScreen() {
   const { remindersId } = useLocalSearchParams()
@@ -328,15 +329,33 @@ export default function RemindersScreen() {
             </ScrollView>
           )}
           
-          <Pressable style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}, !isEditable && {opacity: 0}]} 
+          {isEditable && (
+          <Pressable
             onPress={saveReminder}
-            disabled={!isEditable}
+            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]}
           >
-            <View style={{alignItems: 'center'}}>
-              <FontAwesome name='save' size={25} color={'white'}/>
-              <Text style={{color: 'white', fontWeight: 'bold'}}>Update</Text>
+            <View style={{ alignItems: 'center' }}>
+              <FontAwesome name='save' size={22} color="white" />
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                {isEditing ? "Update" : "Save"}
+              </Text>
             </View>
           </Pressable>
+        )}
+        
+        {!isEditable && (
+          <Pressable
+            onPress={() => Speech.speak(body)}
+            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}]}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <FontAwesome name='microphone' size={22} color="white" />
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                Read
+              </Text>
+            </View>
+          </Pressable>
+        )}
         </SafeAreaView>
       </Animated.View>
     </KeyboardAvoidingView>

@@ -7,6 +7,7 @@ import { themeColor } from '@/components/constants/themeColor';
 import { useContext } from 'react';
 import { ThemeContext } from '@/context/ThemeContext';
 import createPageStyleSheet from '@/components/styles/createPageStyles';
+import * as Speech from 'expo-speech'
 
 export default function TodoScreen() {
     const { todosId, title: initialTitle, body: initialBody } = useLocalSearchParams()
@@ -109,18 +110,34 @@ export default function TodoScreen() {
                     </Text>
                 </ScrollView>
             )}
-            <Pressable
-                onPress={saveTodo}
-                style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15},!isEditable && {opacity: 0}]}
-                disabled={!isEditable}
-            >
+
+            {isEditable && (
+                <Pressable
+                    onPress={saveTodo}
+                    style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]}
+                >
                 <View style={{ alignItems: 'center' }}>
                     <FontAwesome name='save' size={22} color="white" />
                     <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                        Update
+                    {isEditing ? "Update" : "Save"}
                     </Text>
                 </View>
-            </Pressable>
+                </Pressable>
+            )}
+                    
+            {!isEditable && (
+                <Pressable
+                    onPress={() => Speech.speak(body)}
+                    style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}]}
+                >
+                <View style={{ alignItems: 'center' }}>
+                    <FontAwesome name='microphone' size={22} color="white" />
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                        Read
+                    </Text>
+                </View>
+                </Pressable>
+            )}
         </SafeAreaView>
         </KeyboardAvoidingView>
     );
