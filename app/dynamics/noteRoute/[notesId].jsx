@@ -87,7 +87,7 @@ export default function NoteScreen() {
             style={[createPageStyles.inputField, createPageStyles.titleInput]}
         />
         {isEditable ? (
-          <ScrollView style={[createPageStyles.inputField, createPageStyles.bodyInput]}>
+          <ScrollView contentContainerStyle={{flexGrow: 1}}>
             <TextInput
               placeholder="Write your note here"
               placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
