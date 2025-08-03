@@ -7,6 +7,7 @@ import { themeColor } from '@/components/constants/themeColor';
 import { useContext } from 'react';
 import { ThemeContext } from '@/context/ThemeContext';
 import createPageStyleSheet from '@/components/styles/createPageStyles';
+import * as Speech from 'expo-speech';
 
 export default function NoteScreen() {
   const { notesId } = useLocalSearchParams();
@@ -86,7 +87,7 @@ export default function NoteScreen() {
             style={[createPageStyles.inputField, createPageStyles.titleInput]}
         />
         {isEditable ? (
-          <ScrollView>
+          <ScrollView style={[createPageStyles.inputField, createPageStyles.bodyInput]}>
             <TextInput
               placeholder="Write your note here"
               placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
@@ -113,6 +114,18 @@ export default function NoteScreen() {
                 <FontAwesome name='save' size={22} color="white" />
                 <Text style={{ color: 'white', fontWeight: 'bold' }}>
                     Update
+                </Text>
+            </View>
+        </Pressable>
+        <Pressable
+            onPress={() => {Speech.speak(body)}}
+            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}, isEditable && {opacity: 0}]}
+            disabled={isEditable}
+        >
+            <View style={{ alignItems: 'center' }}>
+                <FontAwesome name='microphone' size={22} color="white" />
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                    Read
                 </Text>
             </View>
         </Pressable>
