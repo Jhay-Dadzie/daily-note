@@ -46,6 +46,12 @@
         "projectId": "3f7a841f-688c-40db-b609-92a972ee6a73"
       }
     },
-    "owner": "jhay-dadzie"
+    "owner": "jhay-dadzie",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3f7a841f-688c-40db-b609-92a972ee6a73"
+    }
   }
 }
