@@ -1,168 +1,104 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Platform, Alert, TouchableOpacity } from "react-native";
-import { Link, useRouter } from "expo-router"
-import FontAwesome from "@expo/vector-icons/FontAwesome"
-import { useState, useEffect, useContext } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLocalSearchParams } from "expo-router";
-import Animated, { LinearTransition} from "react-native-reanimated";
-import { StatusBar } from 'expo-status-bar';
-import viewPageStyles from "@/components/styles/styles";
-import {PushNotification} from '@/components/pushNotification'
-import { themeColor } from "@/components/constants/themeColor";
-import { ThemeContext } from "@/context/ThemeContext";
-export default function Reminder() {
-  const { refresh } = useLocalSearchParams()
-  const [reminders, setReminders] = useState([]);
-  const {colorScheme, theme} = useContext(ThemeContext)
-  const styles = viewPageStyles(colorScheme, theme)
-  const reminderStyles = reminderStyleSheet(colorScheme, theme)
-  const deleteNote = async (id) => {
-    Alert.alert("Delete", "Are you sure you want to delete?", 
-      [
-        {
-          text: "NO",
-          onPress: () => null,
-          style: "cancel"
-        },
-        {
-          text: "DELETE",
-          onPress: async () => {
-            const reminderToDelete = reminders.find(reminder => reminder.id === id);
-          
-            if (reminderToDelete?.notificationId) {
-              await PushNotification.cancel(reminderToDelete.notificationId);
-            }
-            const filteredReminders = reminders.filter(reminder => reminder.id !== id)
-            setReminders(filteredReminders)
-            try {
-              await AsyncStorage.setItem('reminders', JSON.stringify(filteredReminders))
-            } catch(error) {
-              console.error("Reminder could not be deleted", error)
-            }
-          },
-          style: "destructive"
-        }
+import { useCallback, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-      ],
-      {cancelable: true}
-    )
-    
-  }
+import EntryList from '@/components/EntryList';
+import { useTheme } from '@/context/ThemeContext';
+import { radius, spacing } from '@/components/constants/themeColor';
+import { PushNotification } from '@/components/pushNotification';
 
-  useEffect(() => {
-    const loadReminders = async () => {
-      try {
-        const savedReminders = await AsyncStorage.getItem('reminders');
-        if (savedReminders) {
-          setReminders(JSON.parse(savedReminders).sort((a, b) => b.id - a.id));
-        } else {
-          setReminders([]);
-        }
-      } catch (error) {
-        console.error('Failed to load notes', error);
-      }
-    };
+const SORT_OPTIONS = [
+  { key: 'schedule', label: 'Soonest first', icon: 'clock-o' },
+  { key: 'newest', label: 'Recently added', icon: 'arrow-down' },
+  { key: 'oldest', label: 'Oldest first', icon: 'arrow-up' },
+  { key: 'title', label: 'Title (A–Z)', icon: 'sort-alpha-asc' },
+];
 
-    loadReminders();
-  }, [refresh]);
+/** Date chip under a reminder's body, flagged when the time has passed. */
+function ScheduleChip({ schedule }) {
+  const { theme, typography } = useTheme();
+  // Sampled once on mount rather than read during every render, so the chip
+  // stays a pure function of its props.
+  const [now] = useState(() => Date.now());
 
-
-  const renderItem = ({item}) => {
+  if (!schedule) {
     return (
-      <View style={styles.noteView}>
-        <Link href={`/dynamics/reminderRoute/${item.id}`} asChild>
-          <TouchableOpacity underlayColor={"#faf2e2"} style={{flex: 1}}>
-            <View style={styles.noteViewContainer}>
-              <Text style={styles.title}>
-                {item.title.length > 50 ? item.title.slice(0, 50) + '....' : item.title}
-              </Text>
-              <Text style={styles.body}>
-                {item.body.length > 150 ? item.body.slice(0, 150) + '....' : item.body}
-              </Text>
-              <View style={reminderStyles.scheduleContainer}>
-                <Text style={reminderStyles.schedule}>
-                  {
-                    item.schedule ? new Date(item.schedule).toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'}) : 'No date set'
-                  }
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </Link>
-
-        <Pressable style={{
-            marginRight: 15,
-          }}
-          onPress={() => deleteNote(item.id)}
-        >
-          <FontAwesome name="trash" size={22} color={themeColor.colorTheme.color}/>
-        </Pressable>
+      <View style={[styles.chip, { backgroundColor: theme.surfaceAlt }]}>
+        <Text style={[typography.meta, { color: theme.muted }]}>No date set</Text>
       </View>
-    )
+    );
   }
+
+  const past = schedule <= now;
+  const label = new Date(schedule).toLocaleString([], {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Animated.FlatList 
-        data={reminders}
-        contentContainerStyle={reminders.length === 0 ? styles.emptyListContainer : null}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
-        itemLayoutAnimation={LinearTransition}
-        ItemSeparatorComponent={() => <View style={{height: 5}} />}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Image 
-              source={require('../../assets/notification-bell.png')} 
-              style={styles.emptyImage}
-            />
-            <View style={styles.emptyTextContainer}>
-              <Text style={styles.emptyTitle}>No reminders</Text>
-              <Text style={styles.emptySubtitle}>Reminders created will appear here</Text>
-            </View>
-            <Link href={'/createReminder'} asChild>
-              <Pressable style={styles.createNoteButton}>
-                <FontAwesome name="plus" size={18} color={'white'}/>
-                <Text style={styles.createButtonText}>Create Reminder</Text>
-              </Pressable>
-            </Link>
-          </View>
-        )}  
+    <View
+      style={[
+        styles.chip,
+        { backgroundColor: past ? theme.dangerSoft : theme.accentSoft },
+      ]}
+    >
+      <Ionicons
+        name={past ? 'alert-circle-outline' : 'alarm-outline'}
+        size={13}
+        color={past ? theme.danger : theme.accent}
       />
-
-      {
-        reminders.length > 0 && (
-          <Link href={"/createReminder"} asChild>
-            <Pressable style={styles.addNoteButton}>
-              <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
-                  <FontAwesome name='plus' size={25} color={'white'}/>
-                  <View style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Add</Text>
-                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Reminder</Text>
-                    
-                  </View>
-                  
-              </View>
-            </Pressable>
-          </Link>
-        
-        )
-      }
-      <StatusBar style='dark'/>
-    </SafeAreaView>
+      <Text style={[typography.meta, { color: past ? theme.danger : theme.accent }]}>
+        {past ? `Passed · ${label}` : label}
+      </Text>
+    </View>
   );
 }
 
-function reminderStyleSheet(colorScheme, theme) {
-  return StyleSheet.create({
-  scheduleContainer: {
-    backgroundColor: colorScheme ==='light' ? "#d8d8d6" : "#cbc8c8",
-    display: "flex",
-    borderRadius: 9,
-    padding: 8,
-    marginTop: 15,
-    width: "45%",
-    alignItems: 'center'
-  },
-})
+export default function RemindersScreen() {
+  // Deleting a reminder must also cancel its pending notification, and undoing
+  // that delete has to schedule a fresh one (the old id is gone for good).
+  const cancelNotification = useCallback(
+    entry => PushNotification.cancel(entry.notificationId),
+    []
+  );
+
+  const rescheduleNotification = useCallback(async entry => {
+    const notificationId = await PushNotification.schedule({
+      ...entry,
+      schedule: new Date(entry.schedule),
+    });
+    return { ...entry, notificationId };
+  }, []);
+
+  return (
+    <EntryList
+      storageKey="reminders"
+      detailRoute="/dynamics/reminderRoute"
+      createHref="/createReminder"
+      createLabel="New reminder"
+      searchPlaceholder="Search reminders"
+      sortOptions={SORT_OPTIONS}
+      emptyImage={require('../../assets/notification-bell.png')}
+      emptyTitle="No reminders"
+      emptySubtitle="Schedule one and we'll notify you at the right time."
+      deletedMessage="Reminder deleted"
+      bodyLines={2}
+      renderFooter={item => <ScheduleChip schedule={item.schedule} />}
+      onRemove={cancelNotification}
+      onRestore={rescheduleNotification}
+    />
+  );
 }
+
+const styles = StyleSheet.create({
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    alignSelf: 'flex-start',
+    marginTop: spacing.md,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.sm,
+  },
+});

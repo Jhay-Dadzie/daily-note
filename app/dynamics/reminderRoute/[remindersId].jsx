@@ -1,380 +1,104 @@
+import { useEffect, useRef, useState } from 'react';
+import { Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, KeyboardAvoidingView, Alert, TouchableOpacity, ScrollView } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Animated, { SlideInDown } from 'react-native-reanimated';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import DatePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { PushNotification } from '@/components/pushNotification'
-import { themeColor } from '@/components/constants/themeColor';
-import { useContext } from 'react';
-import { ThemeContext } from '@/context/ThemeContext';
-import createPageStyleSheet from '@/components/styles/createPageStyles';
-import * as Speech from 'expo-speech'
 
-export default function RemindersScreen() {
-  const { remindersId } = useLocalSearchParams()
-  const isEditing = remindersId !== 'new';
-  const [isEditable, setIsEditable] = useState(false)
-  const createPageStyles = createPageStyleSheet()
-  const {colorScheme, theme} = useContext(ThemeContext)
+import EntryEditor from '@/components/EntryEditor';
+import ReminderPicker from '@/components/ui/ReminderPicker';
+import { findEntry, updateEntry } from '@/hooks/useEntries';
+import { PushNotification } from '@/components/pushNotification';
 
-  let today = new Date();
-  let timeToRemind = new Date(today.getTime() + 60 * 1000)
-  const defaultStyles = useDefaultStyles();
+export default function ReminderDetailScreen() {
+  const { remindersId } = useLocalSearchParams();
 
-  const [title, setTitle] = useState("")
-  const [body, setBody] = useState("")
-  const [reminders, setReminders] = useState([])
-  
-  const [alarm, setAlarm] = useState(null)
-  const [showReminderOptions, setShowReminderOptions] = useState(false)
-  const [showMode, setShowMode] = useState('date')
-  const [selectedDate, setSelectedDate] = useState(today)
-  const [selectedTime, setSelectedTime] = useState(timeToRemind)
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [spans, setSpans] = useState([]);
+  const [alarm, setAlarm] = useState(null);
+  const [editable, setEditable] = useState(false);
 
-  const isTodaySelected = selectedDate.toDateString() === today.toDateString();
-  const minimumTime = isTodaySelected ? new Date(today.getTime() + 60 * 1000) : undefined;
+  /** The notification currently scheduled for this reminder, if any. */
+  const notificationId = useRef(null);
 
   useEffect(() => {
-    const loadReminders = async (id) => {
-      const savedReminders = await AsyncStorage.getItem('reminders')
-      const parsedReminders = savedReminders ? JSON.parse(savedReminders) : []
-      setReminders(parsedReminders)
+    let cancelled = false;
 
-      if(isEditing) {
-        const reminder = parsedReminders.find(reminder => reminder.id == remindersId)
-        if(reminder) {
-          setBody(reminder.body)
-          setTitle(reminder.title)
-          const reminderDate = new Date(reminder.schedule);
-          setAlarm(reminderDate);
-          setSelectedDate(reminderDate);
-          setSelectedTime(reminderDate);
-        }
-      }
+    findEntry('reminders', remindersId).then(reminder => {
+      if (cancelled || !reminder) return;
+      setTitle(reminder.title ?? '');
+      setBody(reminder.body ?? '');
+      setSpans(reminder.spans ?? []);
+      setAlarm(reminder.schedule ? new Date(reminder.schedule) : null);
+      notificationId.current = reminder.notificationId ?? null;
+    });
+
+    return () => {
+      cancelled = true;
     };
+  }, [remindersId]);
 
-    loadReminders()
-  }, [remindersId])
-
-  const selectDateTimeReminder = () => {
-    const finalDate = new Date(selectedDate);
-    finalDate.setHours(selectedTime.getHours());
-    finalDate.setMinutes(selectedTime.getMinutes());
-    finalDate.setSeconds(0);
-    finalDate.setMilliseconds(0)
-
-    const now = new Date();
-    const isToday = finalDate.toDateString() === now.toDateString();
-    const isPastTime = finalDate.getTime() <= now.getTime();
-    
-    if (isToday && isPastTime) {
-      Alert.alert("Invalid Time", "Please select a future time for today's reminder");
+  const save = async () => {
+    if (!body.trim() && !title.trim()) {
+      Alert.alert('Nothing to save', 'The reminder would be empty.');
       return;
     }
-    
-    setSelectedDate(finalDate);
-    setAlarm(finalDate);
-    setShowReminderOptions(false);
-    setShowMode('date');
-  }
 
-  const saveReminder = async () => {
-    if(body.trim()) { 
-      if (!alarm || alarm.getTime() <= new Date().getTime()) {
-        Alert.alert("Empty Reminder Time", "Please set a future time for your reminder");
-        return;
-      }
-      
-      let updatedReminders = []
-
-      if (isEditing) {
-        const existingReminder = reminders.find(r => r.id == remindersId);
-        if (existingReminder?.notificationId) {
-          await PushNotification.cancel(existingReminder.notificationId);
-        }
-
-        updatedReminders = reminders.map(reminder => (
-          reminder.id == remindersId ? 
-          {...reminder,
-            title: title || "No title",
-            body,
-            schedule: alarm.getTime(),
-            notificationId: null
-          } : 
-          reminder
-        ))
-
-        const updatedReminder = updatedReminders.find(r => r.id == remindersId);
-        updatedReminder.notificationId = await PushNotification.schedule({
-          ...updatedReminder,
-          schedule: alarm
-        });
-
-      } else {
-        const newReminder = {
-          id: Date.now(),
-          title: title || "No title",
-          body,
-          schedule: alarm.getTime(),
-          notificationId: null
-        }
-
-        newReminder.notificationId = await PushNotification.schedule({
-          ...newReminder,
-          schedule: alarm
-        });
-        updatedReminders = [newReminder, ...reminders]
-      }
-
-      await AsyncStorage.setItem('reminders', JSON.stringify(updatedReminders))
-      router.replace({pathname: "/(tabs)/reminder", params: { refresh: Date.now()}});
-    } else {
-      alert("Please type in something before you can update your reminder")
+    if (!alarm || alarm.getTime() <= Date.now()) {
+      Alert.alert('When should we remind you?', 'Pick a future date and time.');
+      return;
     }
-  }
+
+    const resolvedTitle = title.trim() || 'Untitled reminder';
+
+    // Replace rather than mutate: the old notification has to be cancelled
+    // before a new one is scheduled, otherwise it fires at the previous time.
+    await PushNotification.cancel(notificationId.current);
+
+    const nextNotificationId = await PushNotification.schedule({
+      id: remindersId,
+      title: resolvedTitle,
+      body: body.trim(),
+      schedule: alarm,
+    });
+
+    if (!nextNotificationId) {
+      Alert.alert(
+        'Could not schedule',
+        'Check that notifications are allowed for Daily Note, then try again.'
+      );
+      return;
+    }
+
+    notificationId.current = nextNotificationId;
+
+    await updateEntry('reminders', remindersId, {
+      title: resolvedTitle,
+      // Not trimmed: span offsets are indexes into this exact string.
+      body,
+      spans,
+      schedule: alarm.getTime(),
+      notificationId: nextNotificationId,
+    });
+
+    router.back();
+  };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={'padding'}
-    >
-      <Animated.View
-        entering={SlideInDown}
-        style={createPageStyles.container}
-      >
-        <View>
-          <TouchableOpacity 
-            style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
-            onPress={() => setIsEditable((previous) => previous = !previous)}
-          >
-            <Text style={[{fontWeight: 600, color: colorScheme === 'light' ? 'black' : themeColor.colorTheme.color}, isEditable && {color: 'white'}]}>
-              {isEditable ? "Edit mode" : "Read mode"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <Pressable style={styles.setReminderContainer} onPress={() => {
-          setShowReminderOptions(true)
-          setShowMode('date')
-        }}>
-          <View style={styles.setReminderBox}>
-            <Ionicons name="alarm" size={16} color={theme.icon}/>
-            <Text style={{marginLeft: 10, fontWeight: "600", color: theme.title}}>
-              {
-                alarm ? alarm.toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'})
-                : "Set Reminder"
-              }
-            </Text>
-          </View>
-        </Pressable>
-
-        {showReminderOptions && (
-          <Pressable 
-            onPress={() => setShowReminderOptions(false)} 
-            style={{
-              position: 'absolute',
-              top: 0, bottom: 0, left: 0, right: 0,
-              backgroundColor:  'rgba(0, 0, 0, 0.8)',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 10
-            }}
-          >
-            <Pressable 
-              onPress={(e) => e.stopPropagation()}
-              style={{
-                borderRadius: 20,
-                padding: 20,
-                width: '90%',
-                backgroundColor: colorScheme === 'dark' ? "#0c0f01" : null
-              }}
-            >
-              {showMode === 'date' ? (
-                <>
-                  <DatePicker
-                    mode='single'
-                    date={selectedDate}
-                    onChange={({date}) => setSelectedDate(date)}
-                    minDate={today}
-                    styles={{
-                      ...defaultStyles,
-                      today: {backgroundColor: themeColor.colorTheme.color},
-                      selected: {backgroundColor: '#f3e1c0'},
-                      month: {
-                        color: colorScheme === 'light' ? "black" : "white"
-                      },
-                      day: {
-                        color: colorScheme === 'light' ? "black" : "white"
-                      },
-                      weekday_label: {
-                        color: themeColor.colorTheme.color
-                      }
-                    }}
-                  />
-                  <View>
-                    <Pressable 
-                      onPress={() => setShowMode('time')}
-                      style={{
-                        marginTop: 15,
-                        backgroundColor: themeColor.colorTheme.color,
-                        padding: 12,
-                        borderRadius: 10,
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Text style={{color: 'white', fontWeight: 'bold'}}>Select Time</Text>
-                    </Pressable>
-                    <Pressable 
-                      onPress={() => setShowReminderOptions(false)}
-                      style={{
-                        marginTop: 15,
-                        backgroundColor: 'white',
-                        borderWidth: 1,
-                        borderColor: themeColor.colorTheme.color,
-                        padding: 12,
-                        borderRadius: 10,
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Text style={{color: themeColor.colorTheme.color, fontWeight: 'bold'}}>Cancel</Text>
-                    </Pressable>
-                  </View>
-                </>
-              ) : (
-                <>
-                  <DateTimePicker 
-                    mode='time'
-                    value={selectedTime}
-                    display='spinner'
-                    minimumDate={isTodaySelected ? today : undefined}
-                    minimumTime={minimumTime}
-                    is24Hour={false}
-                    onChange={(event, date) => {
-                      if (event.type === 'dismissed') {
-                        setShowMode('date');
-                        return;
-                      }
-                      if (date) {
-                        const now = new Date();
-                        if (isTodaySelected && date.getTime() <= now.getTime()) {
-                          Alert.alert("Invalid Time", "Please select a future time for today's reminder");
-                          setShowMode('date')
-                          return;
-                        }
-                        setSelectedTime(date);
-                      }
-                    }}
-                  />
-                  <View>
-                    <Pressable
-                      onPress={selectDateTimeReminder}
-                      style={{
-                        marginTop: 15,
-                        backgroundColor: themeColor.colorTheme.color,
-                        padding: 12,
-                        borderRadius: 10,
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Text style={{color: 'white', fontWeight: 'bold'}}>Set Reminder</Text>
-                    </Pressable>
-                    <Pressable 
-                      onPress={() => setShowMode('date')}
-                      style={{
-                        marginTop: 15,
-                        backgroundColor: 'white',
-                        borderWidth: 1,
-                        borderColor: themeColor.colorTheme.color,
-                        padding: 12,
-                        borderRadius: 10,
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Text style={{color: themeColor.colorTheme.color, fontWeight: 'bold'}}>Back to Date</Text>
-                    </Pressable>
-                  </View>
-                </>
-              )}
-            </Pressable>
-          </Pressable>
-        )}
-
-        <SafeAreaView style={createPageStyles.inputFieldContainer}>
-          <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
-            placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
-            cursorColor={themeColor.colorTheme.color}
-            value={title}
-            onChangeText={setTitle}
-            editable={isEditable}
-          />
-          {isEditable ? (
-            <ScrollView>
-              <TextInput placeholder='Write your reminder here'
-                placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
-                style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-                cursorColor={themeColor.colorTheme.color}
-                multiline
-                value={body}
-                onChangeText={setBody}
-              />
-            </ScrollView>
-          ): (
-            <ScrollView style={[createPageStyles.inputField, createPageStyles.bodyInput]}>
-              <Text style={{ color: colorScheme === "light" ? '#333' : '#fff', fontSize: 16 }}>
-                {body}
-              </Text>
-            </ScrollView>
-          )}
-          
-          {isEditable && (
-          <Pressable
-            onPress={saveReminder}
-            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]}
-          >
-            <View style={{ alignItems: 'center' }}>
-              <FontAwesome name='save' size={22} color="white" />
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                {isEditing ? "Update" : "Save"}
-              </Text>
-            </View>
-          </Pressable>
-        )}
-        
-        {!isEditable && (
-          <Pressable
-            onPress={() => Speech.speak(body)}
-            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}]}
-          >
-            <View style={{ alignItems: 'center' }}>
-              <FontAwesome name='microphone' size={22} color="white" />
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                Read
-              </Text>
-            </View>
-          </Pressable>
-        )}
-        </SafeAreaView>
-      </Animated.View>
-    </KeyboardAvoidingView>
+    <EntryEditor
+      titleValue={title}
+      onChangeTitle={setTitle}
+      bodyValue={body}
+      onChangeBody={setBody}
+      spansValue={spans}
+      onChangeSpans={setSpans}
+      titlePlaceholder="Reminder title"
+      bodyPlaceholder="What should we remind you about?"
+      editable={editable}
+      onToggleEditable={() => setEditable(previous => !previous)}
+      onSave={save}
+      saveLabel="Update"
+      header={
+        <ReminderPicker value={alarm} onChange={setAlarm} editable={editable} />
+      }
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  setReminderContainer: {
-    borderRadius: 10,
-    
-    padding: 10,
-    display: 'flex',
-    justifyContent: 'center',
-    alignSelf: 'center'
-    
-  },
-  setReminderBox: {
-    display: 'flex',
-    flexDirection: 'row'
-  },
-  
-})
