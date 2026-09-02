@@ -1,81 +1,45 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
-import { View, Pressable, StyleSheet, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView } from 'react-native';
-import Animated, { SlideInDown } from 'react-native-reanimated';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Notes } from '@/components/note';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StatusBar } from 'expo-status-bar';
-import createPageStyleSheet from '@/components/styles/createPageStyles';
-import { themeColor } from '@/components/constants/themeColor';
-import { useContext } from 'react';
-import { ThemeContext } from '@/context/ThemeContext';
-export default function createNote() {
-    
-    const [title, setTitle] = useState("")
-    const [body, setBody] = useState("")
-    const [notes, setNotes] = useState(Notes.sort((a,b) => b.id - a.id)|| [])
-    const createPageStyles = createPageStyleSheet()
-    const {colorScheme, theme} = useContext(ThemeContext)
-    const addNote = async () => {
-        if (body.trim()) {
-            try {
-                const savedNotes = await AsyncStorage.getItem('notes');
-                const existingNotes = savedNotes ? JSON.parse(savedNotes) : [];
-                const newNote = {
-                    id: Date.now(),
-                    title: title || "No title",
-                    body
-                };
-                const updatedNotes = [newNote, ...existingNotes];
-                await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-                setNotes(updatedNotes);
-            
-                router.replace({ pathname: '/', params: { refresh: Date.now() } });
-            } catch (error) {
-                console.error('Failed to save note', error);
-            }
-        } else {
-            alert("Please type your notes before you save");
-        }
+import { Alert } from 'react-native';
+import { router } from 'expo-router';
+
+import EntryEditor from '@/components/EntryEditor';
+import { appendEntry } from '@/hooks/useEntries';
+
+export default function CreateNoteScreen() {
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [spans, setSpans] = useState([]);
+
+  const save = async () => {
+    if (!body.trim() && !title.trim()) {
+      Alert.alert('Nothing to save', 'Write something first.');
+      return;
     }
 
-  return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-        <Animated.View
-            entering={SlideInDown}
-            style={createPageStyles.container}
-        >
-            <SafeAreaView style={createPageStyles.inputFieldContainer}>
-                <TextInput placeholder='Enter title' style={[createPageStyles.inputField, createPageStyles.titleInput]}
-                    placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
-                    autoFocus
-                    cursorColor={themeColor.colorTheme.color}
-                    value={title}
-                    onChangeText={setTitle}
-                />
-                <TextInput placeholder='Write your note here'
-                    placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
-                    style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-                    cursorColor={themeColor.colorTheme.color}
-                    multiline
-                    value={body}
-                    onChangeText={setBody}
-                />
-                <Pressable style={createPageStyles.saveButton} onPress={addNote}>
-                    <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
-                        <FontAwesome name='plus' size={25} color={'white'}/>
-                        <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Save</Text>
-                    </View>
-        
-                </Pressable>
+    await appendEntry('notes', {
+      title: title.trim() || 'Untitled note',
+      // Not trimmed: span offsets are indexes into this exact string.
+      body,
+      spans,
+    });
 
-            </SafeAreaView>
-            <StatusBar style='dark'/>
-        </Animated.View>
-    </KeyboardAvoidingView>
-  )    
+    // The list reloads on focus, so going back is enough.
+    router.back();
+  };
+
+  return (
+    <EntryEditor
+      titleValue={title}
+      onChangeTitle={setTitle}
+      bodyValue={body}
+      onChangeBody={setBody}
+      spansValue={spans}
+      onChangeSpans={setSpans}
+      titlePlaceholder="Note title"
+      bodyPlaceholder="Start writing…"
+      onSave={save}
+      saveLabel="Save"
+      autoFocus
+    />
+  );
 }

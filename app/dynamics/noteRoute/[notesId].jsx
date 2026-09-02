@@ -1,140 +1,63 @@
-import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View, Pressable, Text, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, TouchableOpacity, ScrollView } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { themeColor } from '@/components/constants/themeColor';
-import { useContext } from 'react';
-import { ThemeContext } from '@/context/ThemeContext';
-import createPageStyleSheet from '@/components/styles/createPageStyles';
-import * as Speech from 'expo-speech';
+import { Alert } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 
-export default function NoteScreen() {
+import EntryEditor from '@/components/EntryEditor';
+import { findEntry, updateEntry } from '@/hooks/useEntries';
+
+export default function NoteDetailScreen() {
   const { notesId } = useLocalSearchParams();
-  const isEditing = notesId !== 'new';
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [notes, setNotes] = useState([]);
-  const [isEditable, setIsEditable] = useState(false);
-  const createPageStyles = createPageStyleSheet()
-  const {colorScheme, theme} = useContext(ThemeContext)
+  const [spans, setSpans] = useState([]);
+  const [editable, setEditable] = useState(false);
 
   useEffect(() => {
-    const loadNotes = async () => {
-      const stored = await AsyncStorage.getItem('notes');
-      const parsed = stored ? JSON.parse(stored) : [];
-      setNotes(parsed);
+    let cancelled = false;
 
-      if (isEditing) {
-        const note = parsed.find(note => note.id == notesId);
-        if (note) {
-          setTitle(note.title);
-          setBody(note.body);
-        }
-      }
+    findEntry('notes', notesId).then(note => {
+      if (cancelled || !note) return;
+      setTitle(note.title ?? '');
+      setBody(note.body ?? '');
+      setSpans(note.spans ?? []);
+    });
+
+    return () => {
+      cancelled = true;
     };
-    loadNotes();
   }, [notesId]);
 
-  const saveNote = async () => {
-    if (body.trim()) {
-        let updatedNotes = [];
-
-        if (isEditing) {
-          updatedNotes = notes.map(note => (
-            note.id == notesId 
-            ? { ...note, title: title || 'No title', body } 
-            : note
-          ));
-        } else {
-          const newId = Date.now()
-          const newNote = { id: newId, title: title || 'No title', body };
-          updatedNotes = [newNote, ...notes];
-        }
-
-        await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-        router.replace({ pathname: '/', params: { refresh: Date.now() } });      
-    } else {
-        alert('Please edit your notes by typing before you update')
+  const save = async () => {
+    if (!body.trim() && !title.trim()) {
+      Alert.alert('Nothing to save', 'The note would be empty.');
+      return;
     }
 
+    await updateEntry('notes', notesId, {
+      title: title.trim() || 'Untitled note',
+      // Not trimmed: span offsets are indexes into this exact string.
+      body,
+      spans,
+    });
+
+    router.back();
   };
 
   return (
-    <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <SafeAreaView style={createPageStyles.inputFieldContainer}>
-        <View style={{backgroundColor: theme.background}}>
-          <TouchableOpacity 
-            style={[createPageStyles.viewMode, isEditable && {backgroundColor: themeColor.colorTheme.color}]} 
-            onPress={() => setIsEditable(previous => !previous)}
-          >
-            <Text style={[{fontWeight: 600, color: colorScheme === 'light' ? 'black' : themeColor.colorTheme.color}, isEditable && {color: 'white'}, ]}>
-              {isEditable ? "Edit mode" : "Read mode"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <TextInput
-            placeholder="Enter title"
-            placeholderTextColor={colorScheme === "light" ? '#656768' : '#f2f2f2'}
-            value={title}
-            onChangeText={setTitle}
-            cursorColor={themeColor.colorTheme.color}
-            editable={isEditable}
-            style={[createPageStyles.inputField, createPageStyles.titleInput]}
-        />
-        {isEditable ? (
-          <ScrollView contentContainerStyle={{flexGrow: 1}}>
-            <TextInput
-              placeholder="Write your note here"
-              placeholderTextColor={colorScheme === "light" ? '#717272' : '#ffffff'}
-              value={body}
-              onChangeText={setBody}
-              cursorColor={themeColor.colorTheme.color}
-              multiline
-              style={[createPageStyles.inputField, createPageStyles.bodyInput]}
-            />
-          </ScrollView>
-        ) : (
-          <ScrollView style={[createPageStyles.inputField, createPageStyles.bodyInput]}>
-            <Text style={{ color: colorScheme === "light" ? '#333' : '#fff', fontSize: 16 }}>
-              {body}
-            </Text>
-          </ScrollView>
-        )}
-        
-        {isEditable && (
-          <Pressable
-            onPress={saveNote}
-            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 15}]}
-          >
-            <View style={{ alignItems: 'center' }}>
-              <FontAwesome name='save' size={22} color="white" />
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                {isEditing ? "Update" : "Save"}
-              </Text>
-            </View>
-          </Pressable>
-        )}
-        
-        {!isEditable && (
-          <Pressable
-            onPress={() => Speech.speak(body)}
-            style={[createPageStyles.saveButton, {paddingVertical: 15, paddingHorizontal: 20}]}
-          >
-            <View style={{ alignItems: 'center' }}>
-              <FontAwesome name='microphone' size={22} color="white" />
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                Read
-              </Text>
-            </View>
-          </Pressable>
-        )}
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+    <EntryEditor
+      titleValue={title}
+      onChangeTitle={setTitle}
+      bodyValue={body}
+      onChangeBody={setBody}
+      spansValue={spans}
+      onChangeSpans={setSpans}
+      titlePlaceholder="Note title"
+      bodyPlaceholder="Start writing…"
+      editable={editable}
+      onToggleEditable={() => setEditable(previous => !previous)}
+      onSave={save}
+      saveLabel="Update"
+    />
   );
 }
-

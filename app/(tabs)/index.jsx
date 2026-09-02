@@ -1,134 +1,25 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Pressable, Alert, TouchableOpacity } from "react-native";
-import { Link, useRouter } from "expo-router"
-import FontAwesome from "@expo/vector-icons/FontAwesome"
-import { useState, useEffect } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLocalSearchParams } from "expo-router";
-import Animated, { LinearTransition} from "react-native-reanimated";
-import { StatusBar } from 'expo-status-bar';
-import viewPageStyles from "@/components/styles/styles";
-import { themeColor } from "@/components/constants/themeColor";
+import EntryList from '@/components/EntryList';
 
-export default function Index() {
-  const { refresh } = useLocalSearchParams()
-  const [notes, setNotes] = useState([]);
-  const styles = viewPageStyles()
-  const deleteNote = async (id) => {
-    Alert.alert("Delete", "Are you sure you want to delete?",
-      [
-        {
-          text: "NO",
-          onPress: () => null,
-          style: "cancel"
-        },
-        {
-          text: "DELETE",
-          onPress: async () => {
-            const filteredNotes = notes.filter(note => note.id !== id);
-            setNotes(filteredNotes);
-            try {
-              await AsyncStorage.setItem("notes", JSON.stringify(filteredNotes))
-            } catch(error) {
-              console.error("Notes cannot be deleted", error )
-            }
-          },
-          style: "destructive"
-        },
-      ],
-      {
-        cancelable: true,
-        onDismiss: () => null
-      }
-    )
-  }
+const SORT_OPTIONS = [
+  { key: 'newest', label: 'Newest first', icon: 'arrow-down' },
+  { key: 'oldest', label: 'Oldest first', icon: 'arrow-up' },
+  { key: 'title', label: 'Title (A–Z)', icon: 'sort-alpha-asc' },
+];
 
-  const renderItem = ({item}) => {
-    return (
-      <View style={styles.noteView}>
-        <Link href={`/dynamics/noteRoute/${item.id}`} asChild>
-          <TouchableOpacity style={{flex: 1}}>
-            <View>
-              <Text style={styles.title}>
-                {item.title.length > 50 ? item.title.slice(0, 50) + '.....' : item.title}
-              </Text>
-              <Text style={styles.body}>
-                {item.body.length > 200 ? item.body.slice(0, 200) + '.....' : item.body}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </Link>
-
-        <Pressable style={{
-            marginRight: 15,
-          }}
-          onPress={() => deleteNote(item.id)}
-        >
-          <FontAwesome name="trash" size={22} color={themeColor.colorTheme.color}/>
-        </Pressable>
-      </View>
-    )
-  }
-  useEffect(() => {
-    const loadNotes = async () => {
-      try {
-        const savedNotes = await AsyncStorage.getItem('notes');
-        if (savedNotes) {
-          setNotes(JSON.parse(savedNotes).sort((a, b) => b.id - a.id));
-        } else {
-          setNotes([]);
-        }
-      } catch (error) {
-        console.error('Failed to load notes', error);
-      }
-    };
-
-    loadNotes();
-  }, [refresh]);
-
+export default function NotesScreen() {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Animated.FlatList 
-        data={notes}
-        contentContainerStyle={notes.length === 0 ? styles.emptyListContainer : null}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        itemLayoutAnimation={LinearTransition}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{height: 5}} />}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Image 
-              source={require('../../assets/writing.png')} 
-              style={styles.emptyImage}
-            />
-            <View style={styles.emptyTextContainer}>
-              <Text style={styles.emptyTitle}>No notes</Text>
-              <Text style={styles.emptySubtitle}>Notes created will appear here</Text>
-            </View>
-            <Link href={'/createNote'} asChild>
-              <Pressable style={styles.createNoteButton}>
-                <FontAwesome name="plus" size={18} color={'white'}/>
-                <Text style={styles.createButtonText}>Create Note</Text>
-              </Pressable>
-            </Link>
-          </View>
-        )}  
-      />
-
-      {
-        notes.length > 0 && (
-          <Link href={"/createNote"} asChild>
-            <Pressable style={styles.addNoteButton}>
-              <View style={{marginHorizontal: 'auto', height: 50, justifyContent: 'center', alignItems: 'center'}}>
-                  <FontAwesome name='plus' size={25} color={'white'}/>
-                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 12}}>Add Note</Text>
-              </View>
-            </Pressable>
-          </Link>
-        
-        )
-      }
-      <StatusBar style='dark'/>
-    </SafeAreaView>
+    <EntryList
+      storageKey="notes"
+      detailRoute="/dynamics/noteRoute"
+      createHref="/createNote"
+      createLabel="New note"
+      searchPlaceholder="Search notes"
+      sortOptions={SORT_OPTIONS}
+      emptyImage={require('../../assets/writing.png')}
+      emptyTitle="No notes yet"
+      emptySubtitle="Anything you write down will show up here."
+      deletedMessage="Note deleted"
+      bodyLines={3}
+    />
   );
 }
